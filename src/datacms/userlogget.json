@@ -1,0 +1,311 @@
+{
+  "errno": 0,
+  "error": "",
+  "fingerprint": "0.0064",
+  "data": {
+    "log_list": [{
+      "id": "687",
+      "level": "0",
+      "uid": "1542584383",
+      "uname": "sevenxuy",
+      "real_name": "\u5f90\u83b9",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "",
+      "update_time": "2015-05-12 14:39:49"
+    }, {
+      "id": "686",
+      "level": "0",
+      "uid": "287234961",
+      "uname": "huajie19890",
+      "real_name": "\u534e\u6770",
+      "log_type": "login",
+      "module": "USER_GET_LIST",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/UserGetList.php",
+      "update_time": "2015-05-12 11:30:45"
+    }, {
+      "id": "685",
+      "level": "0",
+      "uid": "287234961",
+      "uname": "huajie19890",
+      "real_name": "\u534e\u6770",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 11:30:44"
+    }, {
+      "id": "684",
+      "level": "0",
+      "uid": "287234961",
+      "uname": "huajie19890",
+      "real_name": "\u534e\u6770",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 11:30:42"
+    }, {
+      "id": "683",
+      "level": "0",
+      "uid": "287234961",
+      "uname": "huajie19890",
+      "real_name": "\u534e\u6770",
+      "log_type": "login",
+      "module": "USER_GET_LIST",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/UserGetList.php",
+      "update_time": "2015-05-12 11:30:41"
+    }, {
+      "id": "682",
+      "level": "0",
+      "uid": "287234961",
+      "uname": "huajie19890",
+      "real_name": "\u534e\u6770",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 11:30:40"
+    }, {
+      "id": "681",
+      "level": "0",
+      "uid": "1542584383",
+      "uname": "sevenxuy",
+      "real_name": "\u5f90\u83b9",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 11:15:06"
+    }, {
+      "id": "680",
+      "level": "0",
+      "uid": "1542584383",
+      "uname": "sevenxuy",
+      "real_name": "\u5f90\u83b9",
+      "log_type": "operate",
+      "module": "act",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/SchemaAdd.phpSCHEMA_ADD_hi",
+      "update_time": "2015-05-12 11:13:07"
+    }, {
+      "id": "679",
+      "level": "0",
+      "uid": "287234961",
+      "uname": "huajie19890",
+      "real_name": "\u534e\u6770",
+      "log_type": "login",
+      "module": "USER_GET_LIST",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/UserGetList.php",
+      "update_time": "2015-05-12 11:09:51"
+    }, {
+      "id": "678",
+      "level": "0",
+      "uid": "287234961",
+      "uname": "huajie19890",
+      "real_name": "\u534e\u6770",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 11:09:51"
+    }, {
+      "id": "677",
+      "level": "0",
+      "uid": "287234961",
+      "uname": "huajie19890",
+      "real_name": "\u534e\u6770",
+      "log_type": "login",
+      "module": "USER_GET_LIST",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/UserGetList.php",
+      "update_time": "2015-05-12 11:09:39"
+    }, {
+      "id": "676",
+      "level": "0",
+      "uid": "1542584383",
+      "uname": "sevenxuy",
+      "real_name": "\u5f90\u83b9",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 11:08:56"
+    }, {
+      "id": "675",
+      "level": "0",
+      "uid": "1542584383",
+      "uname": "sevenxuy",
+      "real_name": "\u5f90\u83b9",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 11:08:56"
+    }, {
+      "id": "674",
+      "level": "0",
+      "uid": "1542584383",
+      "uname": "sevenxuy",
+      "real_name": "\u5f90\u83b9",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 11:08:17"
+    }, {
+      "id": "673",
+      "level": "0",
+      "uid": "1542584383",
+      "uname": "sevenxuy",
+      "real_name": "\u5f90\u83b9",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 11:07:39"
+    }, {
+      "id": "672",
+      "level": "0",
+      "uid": "1542584383",
+      "uname": "sevenxuy",
+      "real_name": "\u5f90\u83b9",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 11:07:17"
+    }, {
+      "id": "671",
+      "level": "0",
+      "uid": "287234961",
+      "uname": "huajie19890",
+      "real_name": "\u534e\u6770",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 11:06:19"
+    }, {
+      "id": "670",
+      "level": "0",
+      "uid": "1542584383",
+      "uname": "sevenxuy",
+      "real_name": "\u5f90\u83b9",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 11:05:48"
+    }, {
+      "id": "669",
+      "level": "0",
+      "uid": "1542584383",
+      "uname": "sevenxuy",
+      "real_name": "\u5f90\u83b9",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 11:05:43"
+    }, {
+      "id": "668",
+      "level": "0",
+      "uid": "1542584383",
+      "uname": "sevenxuy",
+      "real_name": "\u5f90\u83b9",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 11:05:33"
+    }, {
+      "id": "667",
+      "level": "0",
+      "uid": "1542584383",
+      "uname": "sevenxuy",
+      "real_name": "\u5f90\u83b9",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 11:05:27"
+    }, {
+      "id": "666",
+      "level": "0",
+      "uid": "1542584383",
+      "uname": "sevenxuy",
+      "real_name": "\u5f90\u83b9",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 11:05:19"
+    }, {
+      "id": "665",
+      "level": "0",
+      "uid": "1542584383",
+      "uname": "sevenxuy",
+      "real_name": "\u5f90\u83b9",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 11:05:10"
+    }, {
+      "id": "664",
+      "level": "0",
+      "uid": "1542584383",
+      "uname": "sevenxuy",
+      "real_name": "\u5f90\u83b9",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 11:05:02"
+    }, {
+      "id": "663",
+      "level": "0",
+      "uid": "1542584383",
+      "uname": "sevenxuy",
+      "real_name": "\u5f90\u83b9",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 11:04:34"
+    }, {
+      "id": "662",
+      "level": "0",
+      "uid": "1542584383",
+      "uname": "sevenxuy",
+      "real_name": "\u5f90\u83b9",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 11:04:02"
+    }, {
+      "id": "661",
+      "level": "0",
+      "uid": "1542584383",
+      "uname": "sevenxuy",
+      "real_name": "\u5f90\u83b9",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 11:04:00"
+    }, {
+      "id": "660",
+      "level": "0",
+      "uid": "1542584383",
+      "uname": "sevenxuy",
+      "real_name": "\u5f90\u83b9",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 11:02:52"
+    }, {
+      "id": "659",
+      "level": "0",
+      "uid": "287234961",
+      "uname": "huajie19890",
+      "real_name": "\u534e\u6770",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 10:59:20"
+    }, {
+      "id": "658",
+      "level": "0",
+      "uid": "287234961",
+      "uname": "huajie19890",
+      "real_name": "\u534e\u6770",
+      "log_type": "login",
+      "module": "INDEX",
+      "data": "\/home\/work\/odp\/app\/ucms\/models\/service\/page\/Index.php",
+      "update_time": "2015-05-12 10:58:22"
+    }],
+    "log_total": 687,
+    "offset": 0,
+    "limit": 30
+  }
+}

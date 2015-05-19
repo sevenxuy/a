@@ -1,0 +1,15 @@
+{
+  "name": "cs",
+  "version": "0.0.0",
+  "dependencies": {
+    "gulp": "latest",
+    "gulp-connect": "latest",
+    "gulp-livereload": "latest",
+    "gulp-concat": "latest",
+    "gulp-uglify": "latest",
+    "requirejs": "latest"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "errno": 0,
+  "error": "",
+  "fingerprint": "0.0127",
+  "data": {
+    "data": [{
+      "id": "37",
+      "data": "{\"ukey\":\"\",\"ukey_brief\":\"\\u6700\\u725b\\u5fae\\u89c6\\u98915.102\"}",
+      "schema_code": "root_schema",
+      "status": "0",
+      "update_time": "2015-05-12 17:25:30"
+    }, {
+      "id": "29",
+      "data": "{\"ukey\":\"hua1\",\"ukey_brief\":\"ceshi\"}",
+      "schema_code": "root_schema",
+      "status": "0",
+      "update_time": "2015-05-08 23:45:02"
+    }, {
+      "id": "28",
+      "data": "{\"ukey\":\"cc1\",\"ukey_brief\":\"cc11\"}",
+      "schema_code": "root_schema",
+      "status": "0",
+      "update_time": "2015-05-08 23:23:03"
+    }, {
+      "id": "27",
+      "data": "{\"ukey\":\"cc1\",\"ukey_brief\":\"cc11\"}",
+      "schema_code": "root_schema",
+      "status": "0",
+      "update_time": "2015-05-08 23:18:24"
+    }, {
+      "id": "1",
+      "data": "{\"ukey\":\"xinwen25\",\"ukey_brief\":\"\\u8f9b\\u95fb\\u8054\\u64ad5.2\"}",
+      "schema_code": "root_schema",
+      "status": "0",
+      "update_time": "2015-05-08 23:17:55"
+    }, {
+      "id": "23",
+      "data": "{\"ukey\":\"x6\",\"ukey_brief\":\"x6x6\"}",
+      "schema_code": "root_schema",
+      "status": "0",
+      "update_time": "2015-05-08 11:52:10"
+    }, {
+      "id": "22",
+      "data": "{\"ukey\":\"x6\",\"ukey_brief\":\"x6x6\"}",
+      "schema_code": "root_schema",
+      "status": "0",
+      "update_time": "2015-05-08 11:52:06"
+    }, {
+      "id": "19",
+      "data": "{\"ukey\":\"x4\",\"ukey_brief\":\"x4x4\"}",
+      "schema_code": "root_schema",
+      "status": "0",
+      "update_time": "2015-05-08 11:35:32"
+    }, {
+      "id": "18",
+      "data": "{\"ukey\":\"x3\",\"ukey_brief\":\"x3x3\"}",
+      "schema_code": "root_schema",
+      "status": "0",
+      "update_time": "2015-05-08 11:22:17"
+    }, {
+      "id": "17",
+      "data": "{\"ukey\":\"x3\",\"ukey_brief\":\"x3x3\"}",
+      "schema_code": "root_schema",
+      "status": "0",
+      "update_time": "2015-05-08 11:22:02"
+    }],
+    "total": 10,
+    "schema_code": "root_schema",
+    "schema_content": "[{\"key\":\"ukey\",\"desc\":\"\\u552f\\u4e00\\u6807\\u8bc6\\u53f7\",\"type\":\"text\",\"regx\":\"\",\"is_index\":1},{\"key\":\"ukey_brief\",\"desc\":\"\\u552f\\u4e00\\u6807\\u8bc6\\u63cf\\u8ff0\",\"type\":\"text\",\"regx\":\"\",\"is_index\":\"\"}]",
+    "parent_id": "0",
+    "m_code": "act"
+  }
+}

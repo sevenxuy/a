@@ -1,0 +1,106 @@
+{
+  "errno": 0,
+  "error": "",
+  "fingerprint": "",
+  "data": [
+    {
+      "key": "platform",
+      "title": "\u5e73\u53f0",
+      "operator": [
+        "==",
+        ">=",
+        ">"
+      ],
+      "value": [
+        "android",
+        "iphone"
+      ]
+    },
+    {
+      "key": "appver",
+      "title": "\u7248\u672c\u53f7",
+      "operator": [
+        "v=",
+        "v>",
+        "v<",
+        "v>=",
+        "v<=",
+        "in",
+        "notin"
+      ],
+      "value": [
+        
+      ]
+    },
+    {
+      "key": "from",
+      "title": "\u539f\u59cb\u6e20\u9053\u53f7",
+      "operator": [
+        "==",
+        "in",
+        "notin"
+      ],
+      "value": [
+        
+      ]
+    },
+    {
+      "key": "seid",
+      "title": "\u4e13\u7248",
+      "operator": [
+        "==",
+        "in",
+        "notin"
+      ],
+      "value": [
+        
+      ]
+    },
+    {
+      "key": "area",
+      "title": "\u5730\u57df",
+      "operator": [
+        "==",
+        "!=",
+        "in",
+        "notin"
+      ],
+      "value": [
+        
+      ]
+    },
+    {
+      "key": "cfrom",
+      "title": "\u5f53\u524d\u6e20\u9053\u53f7",
+      "operator": [
+        "==",
+        "!=",
+        "in",
+        "notin"
+      ],
+      "value": [
+        
+      ]
+    },
+    {
+      "key": "sopid",
+      "title": "\u8fd0\u8425id",
+      "operator": [
+        "=="
+      ],
+      "value": [
+        
+      ]
+    },
+    {
+      "key": "tag",
+      "title": "tag",
+      "operator": [
+        "=="
+      ],
+      "value": [
+        
+      ]
+    }
+  ]
+}

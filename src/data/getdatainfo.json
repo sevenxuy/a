@@ -1,0 +1,78 @@
+{
+  "errno": 0,
+  "error": "",
+  "fingerprint": "",
+  "data": [{
+    "id": "378",
+    "metadata": "platform == iphone",
+    "version": "1",
+    "schema_id": "278",
+    "status": "1",
+    "base_flag": "0",
+    "updated_time": "1414584800"
+  }, {
+    "id": "379",
+    "metadata": "platform == androidlite",
+    "version": "1",
+    "schema_id": "277",
+    "status": "0",
+    "base_flag": "0",
+    "updated_time": "1414584854"
+  }, {
+    "id": "380",
+    "metadata": "appver v>= 3-0-0-0; platform == androidbzb",
+    "version": "1",
+    "schema_id": "277",
+    "status": "0",
+    "base_flag": "0",
+    "updated_time": "1414584874"
+  }, {
+    "id": "381",
+    "metadata": "appver v>= 4-2-0-0; platform == androidlab",
+    "version": "1",
+    "schema_id": "277",
+    "status": "0",
+    "base_flag": "0",
+    "updated_time": "1414584954"
+  }, {
+    "id": "382",
+    "metadata": "appver v>= 4-2-0-0; platform == android",
+    "version": "1",
+    "schema_id": "277",
+    "status": "0",
+    "base_flag": "0",
+    "updated_time": "1414584973"
+  }, {
+    "id": "383",
+    "metadata": "appver v>= 2-0-1-0; platform == iphone",
+    "version": "2",
+    "schema_id": "279",
+    "status": "0",
+    "base_flag": "0",
+    "updated_time": "1415256887"
+  }, {
+    "id": "384",
+    "metadata": "appver v>= 5-0-0-0; platform == android",
+    "version": "1",
+    "schema_id": "280",
+    "status": "0",
+    "base_flag": "0",
+    "updated_time": "1414585044"
+  }, {
+    "id": "385",
+    "metadata": "appver v>= 5-1-0-0; platform == android",
+    "version": "1",
+    "schema_id": "281",
+    "status": "0",
+    "base_flag": "0",
+    "updated_time": "1414585064"
+  }, {
+    "id": "386",
+    "metadata": "appver v>= 5-2-0-0; platform == android",
+    "version": "40",
+    "schema_id": "282",
+    "status": "0",
+    "base_flag": "0",
+    "updated_time": "1429524726"
+  }]
+}

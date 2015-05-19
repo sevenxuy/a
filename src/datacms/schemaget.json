@@ -1,0 +1,12 @@
+{
+  "errno": 0,
+  "error": "",
+  "fingerprint": "0.0075",
+  "data": {
+    "id": "1",
+    "m_code": "act",
+    "schema_name": "\u6a2a\u5e45\u914d\u7f6e",
+    "schema_code": "act_banner",
+    "schema_content": "[{\"key\":\"img\",\"desc\":\"\\u56fe\\u7247\",\"type\":\"image\",\"regx\":\"\",\"is_index\":\"\"},{\"key\":\"url\",\"desc\":\"\\u94fe\\u63a5\",\"type\":\"link\",\"regx\":\"\",\"is_index\":\"\"},{\"key\":\"title\",\"desc\":\"\\u6807\\u9898\",\"type\":\"text\",\"regx\":\"\",\"is_index\":\"\"}]"
+  }
+}

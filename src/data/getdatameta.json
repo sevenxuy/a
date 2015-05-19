@@ -1,0 +1,14 @@
+{
+  "errno": 0,
+  "error": "",
+  "fingerprint": "",
+  "data": [{
+    "key": "platform",
+    "operator": "==",
+    "value": "androidbzb"
+  }, {
+    "key": "appver",
+    "operator": "v>=",
+    "value": "3-0-0-0"
+  }]
+}

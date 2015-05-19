@@ -1,0 +1,204 @@
+body {
+  font-family: 微软雅黑, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+td {
+  height: 1px;
+  word-break: break-all;
+  max-width: 300px;
+  font-size:13px !important;
+}
+a {
+  cursor: pointer;
+}
+/*nav*/
+
+.sidebar {
+  width: 170px;
+  position: fixed;
+  top: 45px;
+  left: 0;
+  bottom: 0;
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+.sidebar:before {
+  z-index: 0;
+}
+.menu-icon {
+  float: left;
+}
+.nav-list>li:before {
+  height: auto;
+}
+.nav-list>li>a {
+  height: auto;
+}
+.menu-code {
+  color: #AAA;
+  font-size: 12px;
+  word-break: break-all;
+}
+.sidebar+.main-content {
+  margin-left: 170px;
+}
+.breadcrumbs {
+  padding: 0 15px;
+  display: -webkit-box;
+  margin-bottom: 10px;
+}
+.breadcrumbs-content {
+  -webkit-box-flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.btn {
+  margin-right: 6px !important;
+}
+th {
+  text-align: center;
+}
+td {
+  height: 1px;
+}
+textarea {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  /*border: 0;*/
+  
+  -webkit-appearance: none !important;
+  outline: 0 !important;
+  background: transparent;
+  resize: none;
+}
+.btn-import {
+  border-width: 3px !important;
+}
+.btn.btn-link {
+  padding: 0 4px !important;
+}
+.table-tool {
+  float: right;
+}
+/* plugin notify*/
+
+.notify-wrapper {
+  width: 300px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1031;
+}
+.notify {
+  color: #fff;
+  background: rgba(30, 30, 30, 0.8);
+  padding: 10px;
+  border-radius: 2px;
+  margin: 5px;
+}
+.notify-header {
+  display: -webkit-box;
+}
+.notify-warning {
+  background: rgba(252, 248, 227, 0.9);
+  color: #f8991d;
+}
+.notify-error {
+  background: rgba(242, 222, 222, 0.9);
+  color: #cf2826;
+}
+.notify h1,
+.notify p {
+  margin: 0;
+}
+.notify h1 {
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-box-flex: 1;
+}
+.notify p {
+  font-size: 13px;
+  text-align: center;
+  word-break: break-all;
+}
+.notify-error h1:before,
+.notify-warning h1:before {
+  font-family: FontAwesome;
+  margin-right: 5px;
+}
+.notify-error h1:before {
+  content: "\f06a";
+}
+.notify-warning h1:before {
+  content: "\f071";
+}
+.notify-message .ic-times {
+  display: none;
+}
+.notify-header ~ p {
+  text-align: left;
+}
+.row-pink {
+  background: #ebccd1;
+}
+.snapshot {
+  max-width: 100%;
+  height: auto;
+  background: url(../img/imgph.png) no-repeat;
+  min-width: 100%;
+  min-height: 50px;
+  background-size: 100%;
+}
+.row {
+  margin-bottom: 6px;
+}
+label {
+  width: 70px;
+  text-align: right;
+}
+input[type=text] {
+  border-radius: 6px !important;
+  width: 224px;
+  height: 30px;
+  line-height: 30px;
+  padding: 0 4px;
+}
+.reg-level {
+  width: 224px;
+}
+.reg-module,
+.reg-acl {
+  width: 110px;
+}
+.reg-add {
+  height: 30px;
+  line-height: 30px;
+}
+.reg-submit {
+  border-radius: 6px;
+  background: #62a8d1;
+  height: 35px;
+  line-height: 35px;
+  text-align: center;
+  margin-top: 10px;
+}
+.reg-submit:hover {
+  background: #307ecc;
+}
+.fa-times-circle,
+.fa-plus-circle {
+  font-size: 18px;
+}
+.radio {
+  display: inline-block;
+  padding-left: 16px;
+}
+.lbl{
+  font-size: 13px;
+}
+.log-pageid{
+  width: 50px !important;
+}

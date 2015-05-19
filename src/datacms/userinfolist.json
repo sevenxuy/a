@@ -1,0 +1,48 @@
+{
+  "errno": 0,
+  "error": "",
+  "fingerprint": "0.0305",
+  "data": {
+    "userlist": [{
+      "id": "3",
+      "uid": "1415259987",
+      "uname": "\u84dd\u7fd408\u5c4a",
+      "real_name": "\u6768\u519b",
+      "uc": "5327c0b6cfe83038bdec5b54",
+      "department": null,
+      "email": null,
+      "remark": null,
+      "activated": "4",
+      "role": "1",
+      "module_acl": "{\"act\":3,\"acode\":2}",
+      "update_time": "2015-05-14 10:43:01"
+    }, {
+      "id": "2",
+      "uid": "1542584383",
+      "uname": "sevenxuy",
+      "real_name": "\u5f90\u83b9",
+      "uc": "3ff8f15b",
+      "department": null,
+      "email": null,
+      "remark": null,
+      "activated": "4",
+      "role": "9",
+      "module_acl": null,
+      "update_time": "2015-05-12 18:04:09"
+    }, {
+      "id": "1",
+      "uid": "287234961",
+      "uname": "huajie19890",
+      "real_name": "\u534e\u6770",
+      "uc": "91db1e11",
+      "department": null,
+      "email": null,
+      "remark": null,
+      "activated": "4",
+      "role": "9",
+      "module_acl": null,
+      "update_time": "2015-05-12 18:04:09"
+    }],
+    "usertotal": 6
+  }
+}
