@@ -57,7 +57,10 @@ a {
 .breadcrumbs {
     padding: 0 15px;
     display: -webkit-box;
-    margin-bottom: 10px;
+    position: fixed;
+    top: 45px;
+    z-index: 2;
+    left: 170px;
 }
 
 .breadcrumb {
@@ -118,10 +121,11 @@ textarea {
 
 .notify {
     color: #fff;
-    background: rgba(30, 30, 30, 0.8);
+    background: rgba(223, 240, 216, 0.8);
     padding: 10px;
     border-radius: 2px;
     margin: 5px;
+    color: #3c763d;
 }
 
 .notify-header {
@@ -393,4 +397,8 @@ input[type=text] {
     color: #3c763d;
     text-align: left !important;
     font-weight: bold;
+}
+
+.col-xs-12 {
+    margin-top: 50px;
 }

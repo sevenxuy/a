@@ -1,11 +1,18 @@
 define(function(require, exports, module) {
     'use strict';
+
+    var autosize = require('../lib/autosize.min');
+
     $.widget('cs.view', {
-        options: {},
+        options: {
+            uploadfile: '/ucms/cms/uploadfile',
+        },
         _create: function() {
             this.render();
             this._bindEvents();
+            this.element.data('widgetCreated', true);
         },
+        render: function() {},
         _bindEvents: function() {
             this._on(this.element, {
                 'click button.upload-img-btn': this._uploadFile,

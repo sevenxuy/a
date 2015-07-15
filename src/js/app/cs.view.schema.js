@@ -101,6 +101,9 @@ define(function(require, exports, module) {
             //-- data item modal ends
             this.element.append(h.join(''));
             this._createTableElem(data);
+            this.element.find('div.breadcrumbs').css({
+                'width': this.element.width()
+            });
         },
         _bindEvents: function() {
             this._on(this.element, {

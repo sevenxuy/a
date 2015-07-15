@@ -219,6 +219,9 @@ define(function(require, exports, module) {
             if (schema_content && (schema_content.length > options.limit_cols)) {
                 this._initCols();
             }
+            this.element.find('div.breadcrumbs').css({
+                'width': this.element.width()
+            });
         },
         _getSchemaListData: function() {
             var self = this,
@@ -391,13 +394,16 @@ define(function(require, exports, module) {
                 schema_content = options.schema_content,
                 schema_code = options.schema_code,
                 h = [],
-                itemdata = $.parseJSON(item.data);
+                itemdata = $.parseJSON(item.data),
+                $table = this.element.find('#module-table');
             h.push('<td>' + item.id + '</td>');
             _.each(schema_content, function(schema_item, schema_index) {
                 if (schema_item.key === 'ukey') {
                     h.push('<td class="uneditable" data-key="' + schema_item.key + '" data-type="' + schema_item.type + '" data-value="' + (itemdata[schema_item.key] || '') + '">' + (itemdata[schema_item.key] || '') + '</td>')
                 } else {
-                    h.push('<td class="editable" data-key="' + schema_item.key + '" data-type="' + schema_item.type + '" data-value="' + (itemdata[schema_item.key] || '') + '">');
+                    h.push('<td class="editable ');
+                    h.push($table.find('th[data-key=' + schema_item.key + ']').hasClass('hide') ? 'hide' : '');
+                    h.push('" data-key="' + schema_item.key + '" data-type="' + schema_item.type + '" data-value="' + (itemdata[schema_item.key] || '') + '">');
                     switch (schema_item.type) {
                         case 'select':
                             h.push('' + options['select_' + schema_item.key][itemdata[schema_item.key]] + '');
@@ -469,9 +475,9 @@ define(function(require, exports, module) {
                 'click button.data-confirm': this._dataConfirm,
                 'click a.data-expand': this._dataExpand,
                 'click a.data-goto': this._dataGoto,
-                // 'click button.upload-img-btn': this._uploadFile,
-                // 'change input[type=file]': this._uploadImage,
-                // 'change textarea.upload-img-tx': this._previewImg,
+                'click button.upload-img-btn': this._uploadFile,
+                'change input[type=file]': this._uploadImage,
+                'change textarea.upload-img-tx': this._previewImg,
                 'click a.schema-save': this._schemaSave,
                 'click ul.btn-cols-list>li': this._colsShow
             });
@@ -843,6 +849,9 @@ define(function(require, exports, module) {
                                 schema_code: options.schema_code
                             };
                             self._updateDataReq(options.dataadd, reqdata);
+                            notify({
+                                text: '保存成功。'
+                            });
                         } else {
                             //show ukeyexist modal
                             var $modal_ukey = self.element.find('#module-modal-ukey'),
@@ -855,6 +864,7 @@ define(function(require, exports, module) {
                     });
                 } else {
                     notify({
+                        tmpl: 'error',
                         text: '请确认输入“唯一标识号”，并确保“唯一标识号”值以字母打头，由任意顺序的大小写字母、数字、下划线组成。'
                     });
                     return false;

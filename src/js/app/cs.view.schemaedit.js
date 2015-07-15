@@ -7,8 +7,8 @@ define(function(require, exports, module) {
 
     $.widget('cs.schemaedit', _view, {
         options: {
-            schemaget: '../../datacms/schemaget.json',
-            // schemaget: '/ucms/cms/schemaget',
+            // schemaget: '../../datacms/schemaget.json',
+            schemaget: '/ucms/cms/schemaget',
             schemaadd: '/ucms/cms/schemaadd',
             schemaupdate: '/ucms/cms/schemaupdate',
             typeSelectData: ['text', 'link', 'boolean', 'image', 'select', 'time'],
@@ -40,7 +40,7 @@ define(function(require, exports, module) {
                             options.role_current = $.parseJSON(use_acl.module_acl)[options.m_code];
                         }
                         if (((options.role == '1') && (options.role_current == '3')) || (options.role == '5') || (options.role == '9')) {
-                            self.element.append(self._createSchemaEditElem(data));
+                            self._createSchemaEditElem(data);
                             $('textarea').each(function() {
                                 autosize($(this));
                             });
@@ -109,7 +109,7 @@ define(function(require, exports, module) {
             h.push('<div class="schema-table">');
             h.push('<div class="table-header">Schema Plugins');
             h.push('</div>');
-            h.push('<table class="table table-bordered table-hover" style="margin-bottom:0">');
+            h.push('<table class="table table-bordered table-hover">');
             h.push('<thead><tr><th>key</th><th>name</th><th>value</th></tr></thead>');
             h.push('<tbody id="schema-plugin">');
             if (data.schema_extend) {
@@ -127,6 +127,9 @@ define(function(require, exports, module) {
             h.push('</div>');
             h.push('</div>');
             this.element.addClass('hide').empty().append(h.join('')).removeClass('hide');
+            this.element.find('div.breadcrumbs').css({
+                'width': this.element.width()
+            });
         },
         _createSchemaEditElem: function(data) {
             var self = this,
@@ -154,9 +157,12 @@ define(function(require, exports, module) {
             h.push('</tbody></table></div>');
             //-- Schema Info ends
             //-- Schema Content begins
-            h.push('<div class="schema-table"><div class="table-header">Schema Content<div class="table-tool">');
+            h.push('<div class="schema-table"><div class="table-header">Schema Content');
+            h.push('<div class="table-tool">');
             h.push('<a class="btn btn-mini btn-success schema-addprop"  data-toggle="modal" data-target="#schema-modal-content-item"><i class="fa fa-plus"></i> 属性</a>');
-            h.push('</div></div>');
+            h.push('</div>');
+            h.push('</div>');
+            h.push('<div class="table_err hide" id="schemaedit-content-err"></div>');
             h.push('<table class="table table-bordered table-hover"><thead><tr>');
             h.push('<th>key</th><th>desc</th><th>type</th><th>regx</th><th>default</th><th>editable</th><th>is_index</th><th>操作</th>');
             h.push('</tr></thead><tbody id="schemaedit-content">');
@@ -177,7 +183,7 @@ define(function(require, exports, module) {
             h.push('<div class="table-header">Schema Plugins');
             h.push('<div class="table-tool"><a class="btn btn-mini btn-success schema-editplugins" data-toggle="modal" data-target="#schema-modal-plugin"><i class="fa fa-pencil-square-o"></i> 编辑</a></div>');
             h.push('</div>');
-            h.push('<table class="table table-bordered table-hover" style="margin-bottom:0">');
+            h.push('<table class="table table-bordered table-hover">');
             h.push('<thead><tr><th>key</th><th>name</th><th>value</th></tr></thead>');
             h.push('<tbody id="schema-plugin">');
             if (data.schema_extend) {
@@ -196,6 +202,9 @@ define(function(require, exports, module) {
             h.push(this._createContentModalElem());
             h.push(this._createPluginModalElem());
             this.element.addClass('hide').empty().append(h.join('')).removeClass('hide');
+            this.element.find('div.breadcrumbs').css({
+                'width': this.element.width()
+            });
         },
         _createContentModalElem: function() {
             var h = [];
@@ -211,7 +220,7 @@ define(function(require, exports, module) {
             h.push('</div>');
             h.push('<div class="modal-footer">');
             h.push('<button type="button" class="btn btn-mini btn-default schema-modal-content-item-cancel" data-dismiss="modal">取消</button>');
-            h.push('<button type="button" class="btn btn-mini btn-primary schema-modal-content-item-save">保存</button>');
+            h.push('<button type="button" class="btn btn-mini btn-primary schema-modal-content-item-save">添加</button>');
             h.push('</div>');
             h.push('</div></div></div>');
             return h.join('');
@@ -228,30 +237,30 @@ define(function(require, exports, module) {
             h.push('<div class="modal-body">');
             h.push('<div id="schema-modal-plugin-loading" class="cs-loading hide"><div class="cs-loadingico"></div><span>正在加载 ...</span></div>');
             h.push('<div id="schema-modal-plugin-content">');
-            h.push('<table class="table table-bordered table-hover" style="margin-bottom:0">');
+            h.push('<table class="table table-bordered table-hover">');
             h.push('<thead><tr><th>key</th><th>name</th><th>value</th></tr></thead>');
             h.push('<tbody>');
             h.push('<tr><td colspan="3" class="table-header-item">For List</td></tr>');
             if (options.schema_extend && options.schema_extend.plugin && (!_.isEmpty(options.schema_extend.plugin))) {
-                var list = schema_extend.plugin,
+                var schema_extend = options.schema_extend,
+                    list = schema_extend.plugin.list,
                     item = schema_extend.plugin.item;
-
                 h.push('<tr><td>is_sorted</td><td>是否排序</td><td>');
                 h.push('<input id="plugin-list-is_sorted" type="checkbox" ' + (_.findWhere(list, {
                     key: 'is_sorted'
-                }).value == 1 ? 'checked="checked"' : '') + ' class="ace ace-switch ace-switch-2"><span class="lbl middle"></span>');
+                })['value'] == 1 ? 'checked="checked"' : '') + ' class="ace ace-switch ace-switch-2"><span class="lbl middle"></span>');
                 h.push('</td></tr>');
                 h.push('<tr><td>select_import</td><td>选择添加</td><td><div class="table_err hide"></div><textarea id="plugin-list-select_import">' + _.findWhere(list, {
                     key: 'select_import'
-                }).value + '</textarea></td></tr>');
+                })['value'] + '</textarea></td></tr>');
                 //TODO h.push('<tr><td>valid_check</td><td>有效性检查</td><td><textarea></textarea></td></tr>');
                 h.push('<tr><td>sum_limit</td><td>条目限数</td><td><div class="table_err hide"></div><input id="plugin-list-sum_limit" type="text" value="' + _.findWhere(list, {
                     key: 'sum_limit'
-                }).value + '"/></td></tr>');
+                })['value'] + '"/></td></tr>');
                 h.push('<tr><td colspan="3" class="table-header-item">For Item</td></tr>');
                 h.push('<tr><td>preview</td><td>预览</td><td><div class="table_err hide"></div><textarea id="plugin-item-preview">' + _.findWhere(item, {
                     key: 'preview'
-                }).value + '</textarea></td></tr>');
+                })['value'] + '</textarea></td></tr>');
             } else {
                 h.push('<tr><td>is_sorted</td><td>是否排序</td><td>');
                 h.push('<input id="plugin-list-is_sorted" type="checkbox" class="ace ace-switch ace-switch-2"><span class="lbl middle"></span>');
@@ -266,7 +275,7 @@ define(function(require, exports, module) {
             h.push('</div>');
             h.push('<div class="modal-footer">');
             h.push('<button type="button" class="btn btn-mini btn-default schema-modal-plugin-cancel" data-dismiss="modal">取消</button>');
-            h.push('<button type="button" class="btn btn-mini btn-primary schema-modal-plugin-save">保存</button>');
+            h.push('<button type="button" class="btn btn-mini btn-primary schema-modal-plugin-save">确定</button>');
             h.push('</div>');
             h.push('</div></div></div>');
             //-- schema plugins modal ends
@@ -322,7 +331,26 @@ define(function(require, exports, module) {
             h.push('<td>' + item.desc + '</td>');
             h.push('<td>' + item.type + '</td>');
             h.push('<td>' + (item.regx || '') + '</td>');
-            h.push('<td>' + (item.default || '') + '</td>');
+            h.push('<td>');
+            if (!!item.default) {
+                switch (item.type) {
+                    case 'link':
+                        h.push('<a href="' + item.default+'">' + item.default+'</a>');
+                        break;
+                    case 'boolean':
+                        h.push(item.default == '0' ? 'NO' : 'YES');
+                        break;
+                    case 'image':
+                        h.push('<img class="snapshot" src="' + item.default+'">');
+                        break;
+                    case 'text':
+                    case 'time':
+                    case 'select':
+                    default:
+                        h.push(item.default || '');
+                }
+            }
+            h.push('</td>');
             h.push('<td>');
             if (item.editable == 0) {
                 h.push('NO');
@@ -350,11 +378,58 @@ define(function(require, exports, module) {
                 'click button.schema-modal-content-item-save': this._saveSchemaItem,
                 'click button.schema-modal-plugin-save': this._savePlugin,
                 'change select.schema-type': this._changeSelect,
-                'change textarea.schema-modal-content-item-regx': this._updateDefaultElem
+                'change textarea.schema-modal-content-item-regx': this._updateDefaultElem,
+                'click button.upload-img-btn': this._uploadFile,
+                'change input[type=file]': this._uploadImage,
+                'change textarea.upload-img-tx': this._previewImg
             });
         },
         _dataSave: function() {
+            var options = this.options,
+                schema_name = this.element.find('#schemaedit-name').val().trim(),
+                $schemaedit_content = this.element.find('#schemaedit-content'),
+                schema_content = [],
+                schema_extend = JSON.stringify(options.schema_extend);
 
+            $schemaedit_content.children('tr').each(function() {
+                schema_content.push($(this).attr('data-data'));
+            });
+
+            if (_.isEmpty(schema_content)) {
+                this.element.find('#schemaedit-content-err').html('Schema Content内容不可为空。').removeClass('hide');
+                return false;
+            } else {
+                schema_content = '[' + schema_content.join(',') + ']';
+            }
+
+            $.ajax({
+                url: options.schemaupdate,
+                data: {
+                    id: options.id,
+                    m_code: options.m_code,
+                    schema_code: options.schema_code,
+                    schema_name: schema_name,
+                    schema_content: schema_content,
+                    schema_extend: schema_extend
+                }
+            }).done(function(res) {
+                if ((!res.errno) && res.data) {
+                    notify({
+                        text: '保存成功。'
+                    });
+                } else {
+                    notify({
+                        tmpl: 'error',
+                        text: response.error
+                    });
+                }
+            }).fail(function(res) {
+                notify({
+                    tmpl: 'error',
+                    text: '保存失败，请稍后再试。'
+                });
+            });
+            return false;
         },
         _addPropElem: function(event) {
             var options = this.options,
@@ -366,7 +441,7 @@ define(function(require, exports, module) {
             h.push('<tr><td>key</td><td class="editable" data-key="key">');
             h.push('<div class="table_tip">提示：key值必须以字母开头，且key值必须为字母、数字或者下划线组合，且不能取值：depth、list、root_id、update_time。</div>');
             h.push('<div class="table_err hide"></div><textarea></textarea></td></tr>');
-            h.push('<tr><td>desc</td><td class="editable" data-key="desc"><textarea></textarea></td></tr>');
+            h.push('<tr><td>desc</td><td class="editable" data-key="desc"><div class="table_err hide"></div><textarea></textarea></td></tr>');
             h.push('<tr><td>type</td><td class="editable" data-key="type">' + this._createSelectElem(options.typeSelectData) + '</td></tr>');
             h.push('<tr><td>regx</td><td class="editable" data-key="regx"><div class="table_err hide"></div><textarea class="schema-modal-content-item-regx"></textarea></td></tr>');
             h.push('<tr><td>editable</td><td class="editable" data-key="editable"><input type="checkbox" checked="checked" class="ace ace-switch ace-switch-2"><span class="lbl middle"></span></td></tr>');
@@ -380,7 +455,6 @@ define(function(require, exports, module) {
             });
         },
         _editPropElem: function(event) {
-            // console.log(_.unescape($(event.target).closest('tr').attr('data-data')));
             var options = this.options,
                 h = [],
                 item = $.parseJSON(_.unescape($(event.target).closest('tr').attr('data-data'))),
@@ -389,7 +463,7 @@ define(function(require, exports, module) {
             $title.html('修改属性');
             h.push('<table class="table table-bordered table-hover">');
             h.push('<tr><td>key</td><td class="editable" data-key="key" data-value="' + item.key + '">' + item.key + '</td></tr>');
-            h.push('<tr><td>desc</td><td class="editable" data-key="desc"><textarea>' + item.desc + '</textarea></td></tr>');
+            h.push('<tr><td>desc</td><td class="editable" data-key="desc"><div class="table_err hide"></div><textarea>' + item.desc + '</textarea></td></tr>');
             h.push('<tr><td>type</td><td class="editable" data-key="type">' + this._createSelectElem(options.typeSelectData, item.type) + '</td></tr>');
             h.push('<tr><td>regx</td><td class="editable" data-key="regx"><div class="table_err hide"></div><textarea class="schema-modal-content-item-regx">' + item.regx + '</textarea></td></tr>');
             h.push('<tr><td>editable</td><td class="editable" data-key="editable"><input type="checkbox" ' + (item.editable == 0 ? '' : 'checked="checked"') + ' class="ace ace-switch ace-switch-2"><span class="lbl middle"></span></td></tr>');
@@ -468,7 +542,7 @@ define(function(require, exports, module) {
                             data['key'] = $(this).attr('data-value');
                         } else {
                             var key = $(this).children('textarea:eq(0)').val().trim(),
-                                $err = $(this).children('div.table_err:eq(0)').removeClass('hide');
+                                $err = $(this).children('div.table_err:eq(0)');
                             if (!!key) {
                                 if (_util.validateId(key)) {
                                     if (options.keysExcept.indexOf(key) > -1) {
@@ -493,8 +567,14 @@ define(function(require, exports, module) {
                         }
                         break;
                     case 'desc':
-                        var desc = $(this).children('textarea:eq(0)').val().trim();
-                        data['desc'] = desc;
+                        var desc = $(this).children('textarea:eq(0)').val().trim(),
+                            $err = $(this).children('div.table_err:eq(0)');
+                        if (desc.length) {
+                            data['desc'] = desc;
+                        } else {
+                            stop = true;
+                            $err.html('请输入desc值，不可为空。').removeClass('hide');
+                        }
                         break;
                     case 'type':
                         var type = $(this).children('select:eq(0)').val();
@@ -517,6 +597,7 @@ define(function(require, exports, module) {
                                 data['default'] = default_;
                                 break;
                             case 'link':
+                                var $err = $(this).children('div.table_err:eq(0)');
                                 default_ = $(this).children('textarea:eq(0)').val().trim();
                                 if (!!default_) {
                                     if (_util.validateUrl(default_)) {
@@ -532,7 +613,7 @@ define(function(require, exports, module) {
                                 data['default'] = default_;
                                 break;
                             case 'image':
-                                default_ = $(this).children('textarea:eq(0)').val().trim();
+                                default_ = $(this).find('textarea:eq(0)').val().trim();
                                 data['default'] = default_;
                                 break;
                             case 'select':
@@ -562,7 +643,7 @@ define(function(require, exports, module) {
                 var $tr = $schemaedit_content.find('tr[data-key=' + $content.data('key') + ']:eq(0)');
                 $tr.empty().append(this._createSchemaContentItemInnerElem(data));
                 $tr.attr({
-                    'data-data': _.escape(JSON.stringify(data))
+                    'data-data': JSON.stringify(data)
                 });
             } else {
                 $schemaedit_content.append(this._createSchemaContentItemElem(data));
@@ -683,7 +764,7 @@ define(function(require, exports, module) {
         },
         _updateDefaultElem: function(event) {
             var $content = this.element.find('#schema-modal-content-item-content'),
-                schema_type = $content.find('td[data-key=type]:eq(0)').val();
+                schema_type = $content.find('select.schema-type:eq(0)').val();
             if (schema_type == 'select') {
                 var regx = $(event.target).val().trim(),
                     $default_ = $content.find('td[data-key=default]:eq(0)'),
