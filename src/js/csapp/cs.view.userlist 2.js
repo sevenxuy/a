@@ -2,7 +2,7 @@ define(function(require, exports, module) {
   'use strict';
   var _util = require('cs.util');
 
-  $.widget('cs.user', {
+  $.widget('cs.userlist', {
     options: {
       // getuserlistUrl: '/udata/mis/getuserlist?app=flyflow',
       getuserlistUrl: '../../data/getuserlist.json',
@@ -94,5 +94,5 @@ define(function(require, exports, module) {
       }
     }
   });
-  module.exports = $.cs.user;
+  module.exports = $.cs.userlist;
 });

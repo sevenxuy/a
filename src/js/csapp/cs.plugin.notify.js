@@ -34,7 +34,7 @@ define(function(require, exports, module) {
         },
         _bindEvents: function() {
             this._on(this._notifyElem, {
-                'click': this.destroy
+                'tap': this.destroy
             });
         },
 

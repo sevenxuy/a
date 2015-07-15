@@ -1,127 +1,128 @@
 define(function(require, exports, module) {
 
-  'use strict';
-  var _util = require('cs.util');
+    'use strict';
 
-  $.widget('cs.pagingbar', {
-    options: {
-      // wrapperElem
-      limitlist: [30, 50, 100]
-    },
-    _create: function() {
-      this.render();
-      this._bindEvents();
-    },
-    render: function() {
-      this._pagingbarElem = $(this.createPagingbarElem()).appendTo(this.options.wrapperElem);
-      this.updateStatus();
-    },
-    createPagingbarElem: function() {
-      var options = this.options,
-        h = [];
-      h.push('<div class="ui-pager-control" role="group">');
-      h.push('<table cellspacing="0" cellpadding="0" border="0" style="margin:0 auto;" class="ui-pg-table"><tbody><tr>');
-      h.push('<td class="ui-pg-button ui-corner-all first_page" style="cursor: default;"><span class="ui-icon ace-icon fa fa-angle-double-left bigger-140"></span></td>');
-      h.push('<td class="ui-pg-button ui-corner-all prev_page" style="cursor: default;"><span class="ui-icon ace-icon fa fa-angle-left bigger-140"></span></td>');
-      h.push('<td class="ui-pg-button ui-state-disabled" style="width: 4px; cursor: default;"><span class="ui-separator"></span></td>');
-      h.push('<td dir="ltr">Page');
-      h.push('<input class="ui-pg-input page-offset" type="text" size="3" maxlength="7" value="" role="textbox"> of <span class="page-total"></span></td>');
-      h.push('<td class="ui-pg-button ui-state-disabled" style="width:4px;"><span class="ui-separator"></span></td>');
-      h.push('<td class="ui-pg-button ui-corner-all next_page" style="cursor: default;"><span class="ui-icon ace-icon fa fa-angle-right bigger-140"></span></td>');
-      h.push('<td class="ui-pg-button ui-corner-all last_page" style="cursor: default;"><span class="ui-icon ace-icon fa fa-angle-double-right bigger-140"></span></td>');
-      h.push('<td dir="ltr">');
-      h.push(_util.createSelectElem({
-        selectClass: 'page-limit',
-        data: options.limitlist,
-        selected: options.limit
-      }))
-      h.push('</td>');
-      h.push('</tr></tbody></table>');
-      h.push('</div>');
-      return h.join('');
-    },
-    updateStatus: function() {
-      console.log(this.options.limit);
-      var options = this.options,
-        offset = options.offset,
-        $first = this._pagingbarElem.find('td.first_page'),
-        $prev = this._pagingbarElem.find('td.prev_page'),
-        $next = this._pagingbarElem.find('td.next_page'),
-        $last = this._pagingbarElem.find('td.last_page'),
-        $offset = this._pagingbarElem.find('input.page-offset'),
-        $limit = this._pagingbarElem.find('select.page-limit'),
-        $total = this._pagingbarElem.find('span.page-total');
-      if (offset == 0) {
-        if (!$first.hasClass('ui-state-disabled')) {
-          $first.addClass('ui-state-disabled');
-        }
-        if (!$prev.hasClass('ui-state-disabled')) {
-          $prev.addClass('ui-state-disabled');
-        }
-      }
-      if (offset == options.totalpages - 1) {
-        if (!$next.hasClass('ui-state-disabled')) {
-          $next.addClass('ui-state-disabled');
-        }
-        if (!$last.hasClass('ui-state-disabled')) {
-          $last.addClass('ui-state-disabled');
-        }
-      }
+    var notify = require('cs.plugin.notify');
 
-      options.totalpages = Math.ceil(options.total / options.limit);
-      $offset.val(parseInt(options.offset, 10) + 1);
-      $limit.val(options.limit);
-      $total.text(options.totalpages);
-    },
-    _bindEvents: function() {
-      this._on(this._pagingbarElem, {
-        'change input.page-offset': this._goPageByChange,
-        'change select.page-limit': this._goPageByChange,
-        'click td.ui-pg-button': this._goPageByNav
-      });
-    },
-    _goPageByChange: function(event) {
-      var options = this.options,
-        offset, limit, router = new Backbone.Router;
-      if ($(event.target).hasClass('page-offset')) {
-        offset = parseInt($(event.target).val().trim(), 10) - 1;
-        if (offset > -1 && offset < options.totalpages) {
-          options.offset = offset;
-        } else {
-          return false;
+    $.widget('cs.pagingbar', {
+        options: {
+            limit: 60,
+            totalpages: 10,
+            pn: 1,
+            routerstr: ''
+        },
+        _create: function() {
+            this.render();
+            this._bindEvents();
+            this.element.data('widgetCreated', true);
+        },
+        render: function() {
+            this._createPagingWrapperElem();
+        },
+        reRender: function(opt) {
+            var options = this.options;
+            _.extend(options, opt);
+            this._updatePagingStatus();
+        },
+        _bindEvents: function() {
+            this._on(this.element, {
+                'click div.page_pre': this._preGoSiblingPage,
+                'click div.page_next': this._preGoSiblingPage,
+                'click div.page_go': this._preGoSiblingPage,
+                'keypress input': this._preGoPage
+            });
+        },
+        _createPagingWrapperElem: function() {
+            var options = this.options,
+                h = [];
+            h.push('<div class="paging">');
+            h.push('<div class="page-btn-white page_pre hide">&lt;</div>');
+            h.push('<div class="page_num"><span class="page_current"></span>');
+            h.push('<span class="num_gap">/</span>');
+            h.push('<span class="page_total"></span>');
+            h.push('</div>');
+            h.push('<div class="page-btn-white page_next hide">&gt;</div>');
+            h.push('<input type="text" class="form-control goto_page">');
+            h.push('<div class="page-btn-white page_go">跳转</div>');
+            h.push('</div>');
+            this.element.append(h.join(''));
+            this._updatePagingStatus();
+        },
+        _updatePagingStatus: function() {
+            var options = this.options,
+                pn = parseInt(options.pn, 10),
+                totalpages = options.totalpages,
+                $paging = this.element.find('div.paging:eq(0)');
+            if (totalpages > 1) {
+                var $pre = $paging.children('div.page_pre:eq(0)'),
+                    $next = $paging.children('div.page_next:eq(0)'),
+                    $cur = $paging.find('span.page_current:eq(0)'),
+                    $total = $paging.find('span.page_total:eq(0)');
+                if ((pn == 1) && (!$pre.hasClass('hide'))) {
+                    $pre.addClass('hide');
+                } else if ((pn > 1) && $pre.hasClass('hide')) {
+                    $pre.removeClass('hide');
+                }
+                if ((pn == totalpages) && (!$next.hasClass('hide'))) {
+                    $next.addClass('hide');
+                } else if ((pn < totalpages) && $next.hasClass('hide')) {
+                    $next.removeClass('hide');
+                }
+                $cur.text(pn);
+                $total.text(totalpages);
+                if ($paging.hasClass('hide')) {
+                    $paging.removeClass('hide');
+                }
+            } else if (!$paging.hasClass('hide')) {
+                $paging.addClass('hide');
+            }
+            return false;
+        },
+        _preGoSiblingPage: function(event) {
+            var options = this.options,
+                pn = parseInt(options.pn, 10),
+                totalpages = options.totalpages,
+                $btn = $(event.target),
+                $paging = this.element.find('div.paging:eq(0)'),
+                $pre = $paging.children('div.page_pre:eq(0)'),
+                $next = $paging.children('div.page_next:eq(0)'),
+                $cur = $paging.find('span.page_current:eq(0)');
+            if ($btn.hasClass('page_pre')) {
+                pn = pn - 1;
+            } else if ($btn.hasClass('page_next')) {
+                pn = pn + 1;
+            } else if ($btn.hasClass('page_go')) {
+                var $input = $paging.find('input.goto_page'),
+                    page = $input.val().trim();
+                if (parseInt(page, 10) && page > 0 && page < totalpages + 1) {
+                    pn = page;
+                } else {
+                    notify({
+                        tmpl: 'warning',
+                        text: '请输入正确的页码。'
+                    });
+                    $input.val('');
+                    return false;
+                }
+            }
+            if (pn > 0) {
+                this._goSiblingPage(options.routerstr, pn);
+            }
+            return false;
+        },
+        _goSiblingPage: function(routerstr, pn) {
+            var router = new Backbone.Router;
+            router.navigate(routerstr + '/' + pn, {
+                trigger: true
+            });
+            return false;
+        },
+        _preGoPage: function(event) {
+            var code = event.keyCode || event.which;
+            if (code == 13) {
+                $('div.page_go').trigger('click');
+            }
         }
-      } else {
-        limit = parseInt($(event.target).val(), 10);
-        options.limit = limit;
-        options.offset = 0;
-        options.totalpages = Math.ceil(options.total / options.limit);
-        console.log(options.limit);
-      }
-      router.navigate('log/' + options.limit + '/' + options.offset, {
-        trigger: true
-      });
-      return false;
-    },
-    _goPageByNav: function(event) {
-      var options = this.options,
-        $td = $(event.target).closest('td'),
-        router = new Backbone.Router;
-      if ($td.hasClass('first_page')) {
-        options.offset = 0;
-      } else if ($td.hasClass('prev_page')) {
-        options.offset = parseInt(options.offset, 10) - 1;
-      } else if ($td.hasClass('next_page')) {
-        options.offset = parseInt(options.offset, 10) + 1;
-      } else if ($td.hasClass('last_page')) {
-        options.offset = options.totalpages - 1;
-      } else {
-        return false;
-      }
-      router.navigate('log/' + options.limit + '/' + options.offset, {
-        trigger: true
-      });
-      return false;
-    }
-  });
-  module.exports = $.cs.pagingbar;
+    });
+    module.exports = $.cs.pagingbar;
 });

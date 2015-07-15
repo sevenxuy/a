@@ -5,10 +5,18 @@
   "data": [{
     "key": "platform",
     "operator": "==",
-    "value": "androidbzb"
+    "value": "android"
   }, {
     "key": "appver",
     "operator": "v>=",
-    "value": "3-0-0-0"
+    "value": "4-0-0-0"
+  }, {
+    "key": "area",
+    "operator": "==",
+    "value": "\u676d\u5dde\u5e02"
+  }, {
+    "key": "from",
+    "operator": "==",
+    "value": "1200a"
   }]
 }

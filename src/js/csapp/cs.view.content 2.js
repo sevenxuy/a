@@ -1,18 +1,21 @@
 define(function(require, exports, module) {
   'use strict';
-  var autosize = require('../cslib/autosize.min');
-  var _util = require('cs.util'),
-    _contentdata,
-    _cate_info,
-    _schema,
-    _data_info,
-    level = 0;
+  var autosize = require('../cslib/autosize.min'),
+    _util = require('cs.util'),
+    notify = require('cs.plugin.notify');
 
   $.widget('cs.content', {
     options: {
       getdata: '../../data/getdata.json', //for test
       // getdata: '/udata/mis/getdata',
-      app: 'flyflow'
+      savedata: 'http://uil-mis.shahe.baidu.com:8050/udata/mis/saveData',
+      app: 'flyflow',
+      cate_info: {},
+      schema: {},
+      data_info: {},
+      toDeleteNodes: [],
+      toAddDataNodes: [],
+      toUpdateDatNodes: {}
     },
     _create: function(opt) {
       this.render(opt);
@@ -29,50 +32,51 @@ define(function(require, exports, module) {
           app: options.app,
           id: options.id
         }
-      }).done(function(data) {
-        _contentdata = data.data;
-        _cate_info = _contentdata.cate_info;
-        _schema = $.parseJSON(_contentdata.schema);
-        _data_info = _contentdata.data_info;
+      }).done(function(response) {
+        if ((!response.errno) && !_.isEmpty(response.data)) {
+          var data = response.data;
+          options.cate_info = data.cate_info;
+          options.schema = $.parseJSON(data.schema);
+          options.data_info = data.data_info;
 
-        self.element.append(self._renderListElem('0'));
-        if (self.element.hasClass('hide')) {
-          self.element.removeClass('hide');
+          var codeArray = options.parent_code.split('-'),
+            inner = options.schema.inner,
+            list = options.data_info.data.list;
+
+          for (var i = codeArray.length - 1; i > 0; i--) {
+            inner = inner.inner;
+          }
+          options.inner = inner;
+          for (var m = 1, n = codeArray.length; m < n; m++) {
+            list = list[codeArray[m]].list;
+          }
+          options.list = list;
+
+          self.element.append(self._createListElem());
+
+          if (self.element.hasClass('hide')) {
+            self.element.removeClass('hide').addClass('current');;
+          }
+          $('textarea').each(function() {
+            autosize($(this));
+          });
         }
-        $('textarea').each(function() {
-          autosize($(this));
-        });
       });
     },
     reRender: function(opt) {
-
       this.element.addClass('hide').empty();
       this.render(opt);
-      this.element.removeClass('hide').addClass('current');
     },
-    getPropByParentCode: function(dataTreeCode) {
-      var inner = _schema.inner;
-      for (var i = dataTreeCode.length - 1; i > 0; i--) {
-        inner = inner.inner;
-      }
-      return inner.prop;
-    },
-    getListByParentCode: function(dataTreeCode) {
-      var codeArray = dataTreeCode.split('');
-      var list = _data_info.data.list;
-      for (var i = 1, j = codeArray.length; i < j; i++) {
-        list = list[codeArray[i]].list;
-      }
-      return list;
-    },
-    _renderListElem: function(dataTreeCode) {
-      var h = [],
-        prop = this.getPropByParentCode(dataTreeCode),
-        list = this.getListByParentCode(dataTreeCode);
-      h.push('<div id="content' + dataTreeCode + '" class="content">');
+    _createListElem: function() {
+      var self = this,
+        options = this.options,
+        prop = options.inner.prop,
+        list = options.list,
+        h = [];
       h.push('<div class="breadcrumbs">');
-      h.push('<div class="breadcrumbs-content" data-rel="tooltip" title=""></div>');
+      h.push('<div class="breadcrumbs-content" data-rel="tooltip" title="Data">Data</div>');
       h.push('<div class="table-tool">');
+      h.push('<button class="btn btn-mini btn-danger content-save hide"><i class="fa fa-save"></i> 保存</button>');
       h.push('<button class="btn btn-mini btn-success content-add"><i class="fa fa-plus"></i> 新增</button>');
       h.push('<div class="btn-group">');
       h.push('<button class="btn btn-mini btn-yellow dropdown-toggle btn-import" data-toggle="dropdown">导入<i class="ace-icon fa fa-angle-down icon-on-right"></i></button>');
@@ -84,74 +88,252 @@ define(function(require, exports, module) {
       h.push('</div>');
       h.push('</div>');
       h.push('</div>');
-      h.push('<div class="col-xs-12"><table class="table table-bordered table-hover"><thead class="thin-border-bottom"><tr>');
+      h.push('<div class="col-xs-12"><table class="table table-bordered table-hover" data-code="' + options.parent_code + '"><thead class="thin-border-bottom"><tr>');
       _.each(prop, function(item, index) {
         h.push('<th data-key="' + item.key + '" data-type="' + item.type + '" data-regx="' + item.regx + '">' + item.desc + '</th>');
       });
       h.push('<th>操作</th></tr></thead>');
       h.push('<tbody>');
       _.each(list, function(listitem, i) {
-        h.push('<tr data-code="' + dataTreeCode + i + '">');
-        _.each(prop, function(item, index) {
-          h.push('<td>');
-          switch (item.type) {
-            case 'text':
-              h.push('<textarea>' + listitem[item.key] + '</textarea>');
-              break;
-            case 'boolean':
-              if (listitem[item.key] == '1') {
-                h.push('<input checked="checked" type="checkbox" class="ace ace-switch ace-switch-2"><span class="lbl middle"></span>');
-              } else {
-                h.push('<input type="checkbox" class="ace ace-switch ace-switch-2"><span class="lbl middle"></span>');
-              }
-              break;
-          }
-          h.push('</td>');
-        });
-        h.push('<td>');
-        if (!_.isEmpty(listitem.list)) {
-          h.push('<a class="btn btn-link content-expand">展开</a>');
-        }
-        h.push('<a class="btn btn-link content-del">删除</a>');
-        h.push('</td>')
-        h.push('</tr>');
+        h.push(self._createItemElem(listitem, i));
       });
       h.push('</tbody>');
-      h.push('</table></div></div>');
+      h.push('</table></div>');
       return h.join('');
+    },
+    _createItemElem: function(listitem, i) {
+      var
+        options = this.options,
+        parent_code = options.parent_code,
+        inner = options.inner,
+        prop = inner.prop,
+        toggleExpandLink = (inner.type == 'list'),
+        h = [];
+      h.push('<tr data-code="' + parent_code + '-' + i + '" data-index="' + i + '">');
+      _.each(prop, function(item, index) {
+        h.push('<td class="editable" data-key="' + item.key + '" data-type="' + item.type + '">');
+        switch (item.type) {
+          case 'text':
+            h.push('<textarea>' + listitem[item.key] + '</textarea>');
+            break;
+          case 'boolean':
+            h.push('<input type="checkbox"');
+            if (listitem[item.key] == '1') {
+              h.push(' checked="checked"');
+            }
+            h.push(' class="ace ace-switch ace-switch-2"><span class="lbl middle"></span>');
+            break;
+        }
+        h.push('</td>');
+      });
+      h.push('<td>');
+      //show expand link according to schema, not data
+      if (toggleExpandLink) {
+        h.push('<a class="btn btn-link content-expand">展开</a>');
+      }
+      h.push('<a class="btn btn-link content-del">删除</a>');
+      h.push('</td>')
+      h.push('</tr>');
+      return h.join('');
+    },
+    _addBlankItemElem: function() {
+      var options = this.options,
+        parent_code = options.parent_code,
+        inner = options.inner,
+        prop = inner.prop,
+        toggleExpandLink = (inner.type == 'list'),
+        h = [];
+      h.push('<tr>');
+      _.each(prop, function(item, index) {
+        h.push('<td data-key="' + item.key + '" data-type="' + item.type + '" class="editable">');
+        switch (item.type) {
+          case 'text':
+            h.push('<textarea></textarea>');
+            break;
+          case 'boolean':
+            h.push('<input type="checkbox" class="ace ace-switch ace-switch-2"><span class="lbl middle"></span>');
+            break;
+        }
+        h.push('</td>');
+      });
+      h.push('<td>');
+      //show expand link according to schema, not data
+      h.push('<a class="btn btn-link content-del">删除</a>');
+      h.push('</td>')
+      h.push('</tr>');
+      this.element.find('tbody').prepend(h.join(''));
+      $('textarea').each(function() {
+        autosize($(this));
+      });
+      $('input.datetimepicker').datetimepicker({
+        format: 'Y-m-d H:i:s'
+      });
     },
     _bindEvents: function() {
       this._on(this.element, {
-        'click input[type=checkbox]': this._editCheckbox,
         'click a.content-expand': this._expandContent,
-        'click a.content-add': this._addItem,
-        'click a.content-del': this._delItem
+        'click button.content-add': this._addBlankItemElem,
+        'click button.content-save': this._saveContent,
+        'click a.content-del': this._delItem,
+        'change input': this._rowpink,
+        'change textarea': this._rowpink,
+        'change select': this._rowpink
       });
     },
-    _editCheckbox: function(event) {
-      var ck = $(event.target);
-      if (ck.checked == 'checked') {
-        ck.checked = '';
-      } else {
-        ck.checked = 'checked';
-      }
-    },
     _expandContent: function(event) {
-      var code = $(event.target).closest('tr').attr('data-code'),
-        parentCode = code.substr(0, code.length - 1);
-      $('#content' + parentCode).addClass('hide');
-      this.element.append(this._renderListElem(code));
+      var options = this.options,
+        code = $(event.target).closest('tr').attr('data-code'),
+        router = new Backbone.Router;
+      router.navigate('data/' + options.id + '/' + code, {
+        trigger: true
+      });
     },
-    _addItem: function(event) {
-      var h = [];
-      h.push();
-      $content = $(event.target).closest('div.content').find('tbody').prepend(h.join(''));
+    _saveContent: function(event) {
+      var self = this,
+        options = this.options;
+      //update all pink rows
+      var $edited = this.element.find('tr.row-pink');
+      if ($edited.length) {
+        //check the first td has value or not
+        $edited.each(function() {
+          if (!$(this).children('td:first-child').children(':eq(0)').val()) {
+            notify({
+              text: '请确认输入完整或删除' + options.inner.prop[0].desc + '为空的行。'
+            });
+            return false;
+          }
+        });
 
+        $edited.each(function() {
+          var dataindex = $(this).attr('data-index');
+          var rowvalue = {};
+          $(this).children('td.editable').each(function() {
+            var type = $(this).attr('data-type');
+            switch (type) {
+              case 'boolean':
+                if ($(this).children(':eq(0)').is(':checked')) {
+                  rowvalue[$(this).attr('data-key')] = '1';
+                } else {
+                  rowvalue[$(this).attr('data-key')] = '0';
+                }
+                break;
+              case 'text':
+                rowvalue[$(this).attr('data-key')] = $(this).children(':eq(0)').val();
+                break;
+            }
+          });
+          console.log(rowvalue);
+          if (dataindex) {
+            options.toUpdateDatNodes[dataindex] = rowvalue;
+          } else {
+            if (options.inner.type == 'list') {
+              rowvalue['list'] = null;
+            }
+            options.toAddDataNodes.unshift(rowvalue);
+          }
+        });
+      }
+
+      //check if there is existing data to update
+      if (!_.isEmpty(options.toUpdateDatNodes)) {
+        this._updateDataNode();
+      }
+      //check if there is data to delete
+      if (options.toDeleteNodes.length) {
+        this._deleteDataNodes();
+      }
+      //check if there is new data to add
+      if (options.toAddDataNodes.length) {
+        this._addDataNodes();
+      }
+
+      $.ajax({
+        url: options.savedata,
+        type: 'POST',
+        data: {
+          app: options.app,
+          id: options.id,
+          data: JSON.stringify(options.data_info.data)
+        }
+      }).done(function(response) {
+        if (!response.errno) {
+          self.reRender({
+            id: options.id
+          });
+        } else {
+          notify({
+            text: response.error
+          });
+          return false;
+        }
+      }).fail(function(response) {
+        notify({
+          text: '保存失败，请稍后再试'
+        });
+        return false;
+      });
       return false;
+    },
+    _updateDataNode: function() {
+      var options = this.options,
+        toUpdateDatNodes = options.toUpdateDatNodes,
+        list = options.data_info.data.list,
+        codeArray = options.parent_code.split('-');
+      for (var m = 1, n = codeArray.length; m < n; m++) {
+        list = list[codeArray[m]].list;
+      }
+      _.each(toUpdateDatNodes, function(value, key) {
+        _.extend(list[key], value);
+      });
+    },
+    _addDataNodes: function() {
+      var options = this.options,
+        toAddDataNodes = options.toAddDataNodes,
+        list = options.data_info.data.list,
+        codeArray = options.parent_code.split('-');
+      for (var m = 1, n = codeArray.length; m < n; m++) {
+        list = list[codeArray[m]].list;
+      }
+      list = list.concat(toAddDataNodes);
+    },
+    _deleteDataNodes: function() {
+      var options = this.options,
+        toDeleteNodes = options.toDeleteNodes,
+        list = options.data_info.data.list,
+        codeArray = options.parent_code.split('-');
+      for (var m = 1, n = codeArray.length; m < n; m++) {
+        list = list[codeArray[m]].list;
+      }
+      for (var i = 0, j = toDeleteNodes.length; i < j; i++) {
+        delete list[toDeleteNodes[i]];
+      }
+      list = _.without(list, undefined);
     },
     _delItem: function(event) {
-      $(event.target).closest('tr').remove();
+      var options = this.options,
+        toDeleteNodes = options.toDeleteNodes,
+        $tr = $(event.target).closest('tr'),
+        dataindex = $tr.attr('data-index');
+      $tr.remove();
+      if (dataindex) {
+        this._showSaveBtn();
+        toDeleteNodes.push(dataindex);
+      }
       return false;
+    },
+    _rowpink: function(event) {
+      var $row = $(event.target).closest('tr');
+      if (!$row.hasClass('row-pink')) {
+        $row.addClass('row-pink');
+      }
+      this._showSaveBtn();
+      return false;
+    },
+    _showSaveBtn: function() {
+      var $savebtn = this.element.find('button.content-save');
+      if ($savebtn.hasClass('hide')) {
+        $savebtn.removeClass('hide');
+      }
     }
   });
   module.exports = $.cs.content;

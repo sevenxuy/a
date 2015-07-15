@@ -9,9 +9,11 @@ var gulp = require('gulp'),
 gulp.task('rjs', function() {
   rjs.optimize({
     baseUrl: 'src/js/app',
+    appdir: 'src/js/app',
     out: 'src/dest/cs.js',
+    preserveLicenseComments: false,
     mainConfigFile: 'src/js/app/main.js',
-    include: ['src/js/lib/almond.js'],
+    include: ['../cslib/almond.js'],
     optimize: 'uglify'
   });
 });

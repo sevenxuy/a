@@ -5,7 +5,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta charset="utf-8">
-  <title>Blank Page - Ace Admin</title>
+  <title>配置管理平台</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <link rel="stylesheet" href="{%$resourceloc%}/css/bootstrap.min.css">
@@ -35,6 +35,10 @@
       </div>
       <div class="navbar-buttons navbar-header pull-right" role="navigation">
         <ul class="nav ace-nav">
+          <li class="green"><a href="#meta">Meta管理</a></li>
+          <li class="grey"><a href="#cate">菜单管理</a></li>
+          <li class="purple"><a href="#user">用户管理</a></li>
+          <li class="blue"><a href="#log">Log</a></li>
           <li class="light-blue">
             <a data-toggle="dropdown" href="#" class="dropdown-toggle">
               <img class="nav-user-photo" src="http://himg.bdimg.com/sys/portrait/item/{%$userinfo.uc%}.jpg" />
@@ -131,7 +135,13 @@
         </div>
         <div id="contentlist" class="hide"></div>
         <div id="content" class="hide"></div>
-        <div id="schema" class="hide"></div>
+        <div id="metaedit" class="hide"></div>
+        <div id="schemaedit" class="hide"></div>
+        <div id="metalist" class="hide"></div>
+        <div id="category" class="hide"></div>
+        <div id="userlist" class="hide"></div>
+        <div id="useredit" class="hide"></div>
+        <div id="loglist" class="hide"></div>
       </div>
     </div>
     <!-- /.main-content -->

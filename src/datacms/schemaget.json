@@ -1,12 +1,17 @@
 {
-  "errno": 0,
-  "error": "",
-  "fingerprint": "0.0075",
-  "data": {
-    "id": "1",
-    "m_code": "act",
-    "schema_name": "\u6a2a\u5e45\u914d\u7f6e",
-    "schema_code": "act_banner",
-    "schema_content": "[{\"key\":\"img\",\"desc\":\"\\u56fe\\u7247\",\"type\":\"image\",\"regx\":\"\",\"is_index\":\"\"},{\"key\":\"url\",\"desc\":\"\\u94fe\\u63a5\",\"type\":\"link\",\"regx\":\"\",\"is_index\":\"\"},{\"key\":\"title\",\"desc\":\"\\u6807\\u9898\",\"type\":\"text\",\"regx\":\"\",\"is_index\":\"\"}]"
-  }
+    "errno": 0,
+    "error": "",
+    "fingerprint": "0.0875",
+    "data": {
+        "id": "11",
+        "m_code": "dreamworks",
+        "schema_name": "\u9875\u9762\u7ed3\u6784\u914d\u7f6e",
+        "schema_code": "act_page",
+        "schema_content": "[{\"key\":\"m_type\",\"desc\":\"\\u5b50\\u6a21\\u5757\\u7c7b\\u578b\",\"type\":\"select\",\"regx\":\"\\u6a2a\\u5e45:banner|\\u5bfc\\u8bed:lead|\\u5185\\u5bb9:content|\\u53cc\\u680f\\u5185\\u5bb9:2colcontent|\\u5206\\u4eab:share|\\u66f4\\u591a:more|\\u70b9\\u8d5e:updown|\\u7ed3\\u675f\\u8bed:tail|\\u8bdd\\u9898pk\\u6807\\u9898:pk_title|\\u8bdd\\u9898pk\\u80cc\\u666f:pk_background|\\u8bdd\\u9898pk\\u8d44\\u8baf:pk_info|\\u8bdd\\u9898pk\\u8bc4\\u8bba:pk_comment\",\"is_index\":\"\"},{\"key\":\"m_name\",\"desc\":\"\\u5b50\\u6a21\\u5757\\u6807\\u9898\",\"type\":\"text\",\"regx\":\"\",\"is_index\":\"\"},{\"key\":\"m_more\",\"desc\":\"\\u66f4\\u591a\",\"type\":\"text\",\"regx\":\"\",\"is_index\":\"\"}]",
+        "schema_extend": "",
+        "use_acl": {
+            "role": "9",
+            "module_acl": "{}"
+        }
+    }
 }

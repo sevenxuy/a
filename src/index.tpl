@@ -44,7 +44,7 @@
             </a>
             <ul class="user-menu dropdown-menu-right dropdown-menu dropdown-caret dropdown-close">
               <li>
-                <a href="#">
+                <a id="userlogout">
                   <i class="ace-icon fa fa-power-off"></i> Logout
                 </a>
               </li>
@@ -135,8 +135,19 @@
   });
 
   if({%$role%} == '5' || {%$role%} == '9'){
-    $('#navToolbar').prepend('<li class="grey"><a href="#modulelist">Module管理</a></li><li class="purple"><a href="#userlist/30/0">User管理</a></li><li class="green"><a href="#log/30/0">Log</a></li>');
+    $('#navToolbar').prepend('<li class="grey"><a href="#modulelist/">Module管理</a></li><li class="purple"><a href="#userlist/1">User管理</a></li><li class="green"><a href="#log/1">Log</a></li>');
   }
+
+  $('#userlogout').on('click', function(event){
+    $.ajax({
+      url: '{%$resourceloc%}/userlogout',
+      crossDomain: true,
+      dataType: 'jsonp',
+    }).always(function(){
+      window.location.href=window.location.href;
+    });
+  });
+
   </script>
 </body>
 
