@@ -41,6 +41,8 @@ define(function(require, exports, module) {
                             options.role_current = $.parseJSON(use_acl.module_acl)[options.m_code];
                         }
                         if (((options.role == '1') && (options.role_current == '3')) || (options.role == '5') || (options.role == '9')) {
+                            // clear allContentKeys so as to avoid all keys history
+                            options.allContentKeys = [];
                             self._createSchemaEditElem(data);
                             $('textarea').each(function() {
                                 autosize($(this));
