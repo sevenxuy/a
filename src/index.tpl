@@ -8,6 +8,7 @@
   <title>CMS平台</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <link rel="stylesheet" href="{%$resourceloc%}/css/jquery-ui.min.css">
   <link rel="stylesheet" href="{%$resourceloc%}/css/bootstrap.min.css">
   <link rel="stylesheet" href="{%$resourceloc%}/css/font-awesome.min.css">
   <link rel="stylesheet" href="{%$resourceloc%}/css/ace.min.css">
@@ -119,7 +120,8 @@
   <script type="text/javascript">
   if ('ontouchstart' in document.documentElement) document.write("<script src='{%$resourceloc%}/js/lib/jquery.mobile.custom.min.js'>" + "<" + "/script>");
   </script>
-  <script src="{%$resourceloc%}/js/lib/jquery-ui.widget.min.js"></script>
+  <script src="{%$resourceloc%}/js/lib/jquery-ui.min.js"></script>
+  <script src="{%$resourceloc%}/js/lib/jquery.ui.touch-punch.min.js"></script>
   <script src="{%$resourceloc%}/js/lib/underscore-min.js"></script>
   <script src="{%$resourceloc%}/js/lib/backbone-min.js"></script>
   <script src="{%$resourceloc%}/js/lib/bootstrap.min.js"></script>

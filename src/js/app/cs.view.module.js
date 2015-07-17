@@ -21,10 +21,15 @@ define(function(require, exports, module) {
             // uploadfile: '../../datacms/uploadfile.json',
             uploadfile: '/ucms/cms/uploadfile',
             ukeyexist: '/ucms/cms/ukeyexist',
+            smapupdate: '/ucms/cms/smapupdate',
             schema_content: [],
             schema_map: {},
             limit: 60,
-            limit_cols: 5
+            limit_cols: 5,
+            is_sorted: false,
+            sum_limit: 60,
+            is_added: false,
+            is_select_import: false
         },
         _create: function() {
             this.render();
@@ -53,12 +58,32 @@ define(function(require, exports, module) {
                                 options.role_current = $.parseJSON(use_acl.module_acl)[options.m_code];
                             }
                             options.schema_content = $.parseJSON(data.schema_content);
+                            options.schema_extend = $.parseJSON(data.schema_extend);
+
                             options.schema_code = data.schema_code;
                             options.m_code = data.m_code;
                             options.parent_id = data.parent_id;
                             options.path = data.path;
                             options.total = data.total;
                             options.totalpages = Math.ceil(options.total / options.limit);
+                            options.sortlist = data.data;
+                            //Sort only for data whose is_sorted value in schema_extend.plugin.list is 1 (true);
+                            //Sort not for data whose parent_id is 0;
+                            options.is_sorted = options.schema_extend && options.schema_extend.plugin && options.schema_extend.plugin.list && (_.findWhere(options.schema_extend.plugin.list, {
+                                key: 'is_sorted'
+                            })['value'] == 1) && (options.parent_id != 0);
+                            options.sum_limit = parseInt(options.schema_extend && options.schema_extend.plugin && options.schema_extend.plugin.list && _.findWhere(options.schema_extend.plugin.list, {
+                                key: 'sum_limit'
+                            })['value'] || options.sum_limit, 10);
+                            options.is_added = options.sum_limit > options.total;
+                            options.is_select_import = options.schema_extend && options.schema_extend.plugin && options.schema_extend.plugin.list && (_.findWhere(options.schema_extend.plugin.list, {
+                                key: 'select_import'
+                            })['value']).length || options.is_select_import;
+                            if (options.is_select_import) {
+                                options.select_import = _.findWhere(options.schema_extend.plugin.list, {
+                                    key: 'select_import'
+                                })['value'];
+                            }
                             self._createModuleElem(data.data);
                             var setting = {
                                 limit: options.limit,
@@ -74,7 +99,7 @@ define(function(require, exports, module) {
                             }
                         }
                     } else {
-                        self.element.addClass('hide').empty().append(self._createModuleDataBlankElem()).removeClass('hide');
+                        self._createModuleDataBlankElem();
                     }
                 } else {
                     notify({
@@ -107,25 +132,7 @@ define(function(require, exports, module) {
                     h.push('<li class="active">Data Depth : ' + (parseInt(path[path.length - 1].depth, 10) + 1) + '</li>');
                 }
                 h.push('</ul></div>');
-                h.push('<div class="table-tool">');
-                h.push('<button class="btn btn-mini btn-success data-add" data-toggle="modal" data-target="#module-modal-data"><i class="fa fa-plus"></i> 新增</button>');
-                if (schema_content && (schema_content.length > options.limit_cols)) {
-                    //-- btn-cols-list begins
-                    h.push('<div class="btn-group">');
-                    h.push('<button data-toggle="dropdown" class="btn btn-mini btn-yellow dropdown-toggle" aria-expanded="false">显示列 <i class="ace-icon fa fa-angle-down icon-on-right"></i></button>');
-                    h.push('<ul class="dropdown-menu dropdown-menu-right dropdown-alert btn-cols-list">');
-                    _.each(schema_content, function(schema_item, schema_index) {
-                        if (schema_index > options.limit_cols - 1) {
-                            h.push('<li data-key="' + schema_item.key + '"><a><i class="fa"></i> ' + schema_item.desc + '</a></li>');
-                        } else {
-                            h.push('<li data-key="' + schema_item.key + '"><a><i class="fa fa-check"></i> ' + schema_item.desc + '</a></li>');
-                        }
-                    });
-                    h.push('</ul>');
-                    h.push('</div>');
-                    //-- btn-cols-list ends
-                }
-                h.push('</div>');
+                h.push(this._createTableToolElem());
                 h.push('</div>');
                 h.push('<div class="col-xs-12">');
                 //data && schema_content
@@ -188,25 +195,7 @@ define(function(require, exports, module) {
                     h.push('<li class="active">Data Depth : ' + path[path.length - 1].depth + '</li>');
                 }
                 h.push('</ul></div>');
-                h.push('<div class="table-tool">');
-                h.push('<button class="btn btn-mini btn-success data-add hide" data-toggle="modal" data-target="#module-modal-data"><i class="fa fa-plus"></i> 新增</button>');
-                if (schema_content && (schema_content.length > options.limit_cols)) {
-                    //-- btn-cols-list begins
-                    h.push('<div class="btn-group hide">');
-                    h.push('<button data-toggle="dropdown" class="btn btn-mini btn-yellow dropdown-toggle" aria-expanded="false">显示列 <i class="ace-icon fa fa-angle-down icon-on-right"></i></button>');
-                    h.push('<ul class="dropdown-menu dropdown-menu-right dropdown-alert btn-cols-list">');
-                    _.each(schema_content, function(schema_item, schema_index) {
-                        if (schema_index > options.limit_cols - 1) {
-                            h.push('<li data-key="' + schema_item.key + '"><a><i class="fa"></i> ' + schema_item.desc + '</a></li>');
-                        } else {
-                            h.push('<li data-key="' + schema_item.key + '"><a><i class="fa fa-check"></i> ' + schema_item.desc + '</a></li>');
-                        }
-                    });
-                    h.push('</ul>');
-                    h.push('</div>');
-                    //-- btn-cols-list ends
-                }
-                h.push('</div>');
+                h.push(this._createTableToolElem());
                 h.push('</div>');
                 h.push('<div class="col-xs-12">');
                 //only show schema add on page
@@ -222,6 +211,43 @@ define(function(require, exports, module) {
             this.element.find('div.breadcrumbs').css({
                 'width': this.element.width()
             });
+
+            if (options.parent_id != 0) {
+                this._createModalSortElem();
+            }
+        },
+        _createTableToolElem: function() {
+            var options = this.options,
+                schema_content = options.schema_content,
+                h = [];
+            h.push('<div class="table-tool">');
+            if (options.is_select_import) {
+                h.push('<button class="btn btn-mini btn-pink data-import" data-toggle="modal" data-target="#module-modal-import">导入</button>');
+            }
+            if (options.is_sorted) {
+                h.push('<button class="btn btn-mini btn-info data-sort" data-toggle="modal" data-target="#module-modal-sort">排序</button>');
+            }
+            if (options.is_added) {
+                h.push('<button class="btn btn-mini btn-success data-add hide" data-toggle="modal" data-target="#module-modal-data"><i class="fa fa-plus"></i> 新增</button>');
+            }
+            if (schema_content && (schema_content.length > options.limit_cols)) {
+                //-- btn-cols-list begins
+                h.push('<div class="btn-group hide">');
+                h.push('<button data-toggle="dropdown" class="btn btn-mini btn-yellow dropdown-toggle" aria-expanded="false">显示列 <i class="ace-icon fa fa-angle-down icon-on-right"></i></button>');
+                h.push('<ul class="dropdown-menu dropdown-menu-right dropdown-alert btn-cols-list">');
+                _.each(schema_content, function(schema_item, schema_index) {
+                    if (schema_index > options.limit_cols - 1) {
+                        h.push('<li data-key="' + schema_item.key + '"><a><i class="fa"></i> ' + schema_item.desc + '</a></li>');
+                    } else {
+                        h.push('<li data-key="' + schema_item.key + '"><a><i class="fa fa-check"></i> ' + schema_item.desc + '</a></li>');
+                    }
+                });
+                h.push('</ul>');
+                h.push('</div>');
+                //-- btn-cols-list ends
+            }
+            h.push('</div>');
+            return h.join('');
         },
         _getSchemaListData: function() {
             var self = this,
@@ -240,6 +266,55 @@ define(function(require, exports, module) {
                     });
                 }
             }).fail(function(response) {});
+        },
+        _createModalSortElem: function() {
+            var h = [];
+            //-- data item modal begins
+            h.push('<div class="modal fade" id="module-modal-sort" tabindex="-1" role="dialog" aria-hidden="true"><div class="modal-dialog large-modal-dialog"><div class="modal-content">');
+            h.push('<div class="modal-header">');
+            h.push('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
+            h.push('<h4 class="modal-title" id="module-modal-sort-title">排序</h4>');
+            h.push('</div>');
+            h.push('<div class="modal-body">');
+            h.push('<div id="module-modal-sort-loading" class="cs-loading hide"><div class="cs-loadingico"></div><span>正在加载 ...</span></div>');
+            h.push('<div id="module-modal-sort-content">');
+            h.push('<ul id="module-modal-sort-head" class="item-list"></ul>');
+            h.push('<ul id="module-modal-sort-list" class="item-list ui-sortable">');
+            // h.push('<li class="item-blue clearfix ui-sortable-handle"></li>');
+            h.push('</ul>');
+            h.push('</div>');
+            h.push('</div>');
+            h.push('<div class="modal-footer">');
+            h.push('<button type="button" class="btn btn-mini btn-default sort-cancel" data-dismiss="modal">取消</button>');
+            h.push('<button type="button" class="btn btn-mini btn-primary sort-save">保存</button>');
+            h.push('</div>');
+            h.push('</div></div></div>');
+            //-- data item modal ends
+            this.element.append(h.join(''));
+            //Android's default browser somehow is confused when tapping on label which will lead to dragging the task
+            //so disable dragging when clicking on label
+            var agent = navigator.userAgent.toLowerCase(),
+                $list = this.element.find('#module-modal-sort-list');
+            if ("ontouchstart" in document && /applewebkit/.test(agent) && /android/.test(agent))
+                $list.on('touchstart', function(e) {
+                    var li = $(e.target).closest('#module-modal-sort-list li');
+                    if (li.length == 0) return;
+                    var label = li.find('label.inline').get(0);
+                    if (label == e.target || $.contains(label, e.target)) e.stopImmediatePropagation();
+                });
+            $list.sortable({
+                opacity: 0.8,
+                revert: true,
+                forceHelperSize: true,
+                placeholder: 'draggable-placeholder',
+                forcePlaceholderSize: true,
+                tolerance: 'pointer',
+                stop: function(event, ui) {
+                    //just for Chrome!!!! so that dropdowns on items don't appear below other items after being moved
+                    $(ui.item).css('z-index', 'auto');
+                }
+            });
+            $list.disableSelection();
         },
         _createModalDataElem: function() {
             var h = [];
@@ -281,25 +356,7 @@ define(function(require, exports, module) {
                 h = [];
             h.push('<div class="breadcrumbs">');
             h.push('<div class="breadcrumbs-content" data-rel="tooltip">Module Data</div>');
-            h.push('<div class="table-tool">');
-            h.push('<button class="btn btn-mini btn-success data-add" data-toggle="modal" data-target="#module-modal-data"><i class="fa fa-plus"></i> 新增</button>');
-            if (schema_content && (schema_content.length > options.limit_cols)) {
-                //-- btn-cols-list begins
-                h.push('<div class="btn-group">');
-                h.push('<button data-toggle="dropdown" class="btn btn-mini btn-yellow dropdown-toggle" aria-expanded="false">显示列 <i class="ace-icon fa fa-angle-down icon-on-right"></i></button>');
-                h.push('<ul class="dropdown-menu dropdown-menu-right dropdown-alert btn-cols-list">');
-                _.each(schema_content, function(schema_item, schema_index) {
-                    if (schema_index > options.limit_cols - 1) {
-                        h.push('<li data-key="' + schema_item.key + '"><a><i class="fa"></i> ' + schema_item.desc + '</a></li>');
-                    } else {
-                        h.push('<li data-key="' + schema_item.key + '"><a><i class="fa fa-check"></i> ' + schema_item.desc + '</a></li>');
-                    }
-                });
-                h.push('</ul>');
-                h.push('</div>');
-                //-- btn-cols-list ends
-            }
-            h.push('</div>');
+            h.push(this._createTableToolElem());
             h.push('</div>');
             h.push('<div class="col-xs-12">');
             h.push('<table class="table table-bordered" id="module-table"><thead class="thin-border-bottom">');
@@ -309,7 +366,10 @@ define(function(require, exports, module) {
             h.push('<div class="cs-nomoredata">没有更多数据</div>');
             h.push('</div>');
             h.push(this._createModalDataElem());
-            return h.join('');
+            this.element.addClass('hide').empty().append(h.join('')).removeClass('hide');
+            this.element.find('div.breadcrumbs').css({
+                'width': this.element.width()
+            });
         },
         _createBlankElem: function() {
             var self = this,
@@ -318,25 +378,7 @@ define(function(require, exports, module) {
                 h = [];
             h.push('<div class="breadcrumbs">');
             h.push('<div class="breadcrumbs-content" data-rel="tooltip">Module Data</div>');
-            h.push('<div class="table-tool">');
-            h.push('<button class="btn btn-mini btn-success data-add" data-toggle="modal" data-target="#module-modal-data"><i class="fa fa-plus"></i> 新增</button>');
-            if (schema_content && (schema_content.length > options.limit_cols)) {
-                //-- btn-cols-list begins
-                h.push('<div class="btn-group">');
-                h.push('<button data-toggle="dropdown" class="btn btn-mini btn-yellow dropdown-toggle" aria-expanded="false">显示列 <i class="ace-icon fa fa-angle-down icon-on-right"></i></button>');
-                h.push('<ul class="dropdown-menu dropdown-menu-right dropdown-alert btn-cols-list">');
-                _.each(schema_content, function(schema_item, schema_index) {
-                    if (schema_index > options.limit_cols - 1) {
-                        h.push('<li data-key="' + schema_item.key + '"><a><i class="fa"></i> ' + schema_item.desc + '</a></li>');
-                    } else {
-                        h.push('<li data-key="' + schema_item.key + '"><a><i class="fa fa-check"></i> ' + schema_item.desc + '</a></li>');
-                    }
-                });
-                h.push('</ul>');
-                h.push('</div>');
-                //-- btn-cols-list ends
-            }
-            h.push('</div>');
+            h.push(this._createTableToolElem());
             h.push('</div>');
             h.push('<div class="col-xs-12">');
             h.push('<table class="table table-bordered" id="module-table"><thead class="thin-border-bottom"><tr><th>id</th>');
@@ -359,6 +401,9 @@ define(function(require, exports, module) {
             if (schema_content && (schema_content.length > options.limit_cols)) {
                 this._initCols();
             }
+            this.element.find('div.breadcrumbs').css({
+                'width': this.element.width()
+            });
         },
         _createItemElem: function(item) {
             var self = this,
@@ -464,6 +509,7 @@ define(function(require, exports, module) {
         },
         _bindEvents: function() {
             this._on(this.element, {
+                'click button.data-sort': this._dataSortElem,
                 'click button.data-add': this._dataAddElem,
                 'click a.data-audit': this._dataAudit,
                 'click a.data-reject': this._dataReject,
@@ -471,6 +517,7 @@ define(function(require, exports, module) {
                 'click a.data-publish': this._dataPublish,
                 'click a.data-del': this._dataDel,
                 'click a.data-edit': this._dataEditElem,
+                'click button.sort-save': this._sortSave,
                 'click button.data-save': this._dataSave,
                 'click button.data-confirm': this._dataConfirm,
                 'click a.data-expand': this._dataExpand,
@@ -524,6 +571,73 @@ define(function(require, exports, module) {
             options.schema_content = $.parseJSON(options.schema_map[options.schema_code]);
             this._createBlankElem();
             return false;
+        },
+        _dataSortElem: function() {
+            var self = this,
+                options = this.options,
+                schema_content = options.schema_content,
+                lists = options.sortlist,
+                limit = options.limit_cols - 1,
+                head = [],
+                h = [],
+                $content = this.element.find('#module-modal-sort-content'),
+                $head = $content.find('#module-modal-sort-head'),
+                $list = $content.find('#module-modal-sort-list');
+            head.push('<li>');
+            head.push('<span>id</span>');
+            _.each(schema_content, function(schema_item, schema_index) {
+                if (schema_index < limit) {
+                    head.push('<span data-key="' + schema_item.key + '">' + schema_item.desc + '</span>');
+                }
+            });
+            head.push('<span data-key="status">status</span>');
+            head.push('</li>');
+            $head.empty().append(head.join(''));
+            _.each(lists, function(item, index) {
+                var itemdata = $.parseJSON(item.data);
+                h.push('<li class="item-blue clearfix ui-sortable-handle" data-id="' + item.id + '">');
+                h.push('<span>' + item.id + '</span>');
+                _.each(schema_content, function(schema_item, schema_index) {
+                    if (schema_index < limit) {
+                        h.push('<span data-key="' + schema_item.key + '">');
+                        switch (schema_item.type) {
+                            case 'select':
+                                h.push('' + options['select_' + schema_item.key][itemdata[schema_item.key]] + '');
+                                break;
+                            case 'image':
+                                if (!!itemdata[schema_item.key]) {
+                                    h.push('<a href="' + (itemdata[schema_item.key] || '') + '"><img class="snapshot" src="' + (itemdata[schema_item.key] || '') + '" /></a>');
+                                } else {
+                                    h.push('');
+                                }
+                                break;
+                            case 'link':
+                                h.push('<a href="' + (itemdata[schema_item.key] || '') + '"><span>' + (itemdata[schema_item.key] || '') + '</span></a>');
+                                break;
+                            case 'boolean':
+                                if (itemdata[schema_item.key] == '1') {
+                                    h.push('YES');
+                                } else {
+                                    h.push('NO');
+                                }
+                                break;
+                            case 'time':
+                            default:
+                                h.push(itemdata[schema_item.key] || '');
+                        }
+                        h.push('</span>');
+                    }
+                });
+                h.push('<span data-key="status"><div class="module-status module-status-' + item.status + '">' + self.getStatusFace(item.status) + '</div></span>');
+                if (schema_content.length > limit) {
+                    h.push('<span>...</span>');
+                }
+                h.push('</li>');
+            });
+            $list.empty().append(h.join(''));
+            $content.find('span[data-key]').css({
+                'width': (90 / (Math.min(schema_content.length, limit) + 1)) + '%'
+            })
         },
         _dataAddElem: function() {
             var self = this,
@@ -627,16 +741,6 @@ define(function(require, exports, module) {
             h.push('<tr><td>status</td><td><div class="module-status module-status-0">' + self.getStatusFace('0') + '</div></td></tr>')
             h.push('</tbody></table>');
             $content.addClass('hide').empty().append(h.join('')).removeClass('hide');
-            var $selecttds = $content.find('td[data-type=select]');
-            $selecttds.each(function() {
-                if ($(this).hasClass('uneditable')) {
-                    contine;
-                }
-                var $select = $(this).find('select:eq(0)');
-                $select.find('option[value=' + data[$(this).attr('data-key')] + ']').attr({
-                    'selected': 'selected'
-                });
-            });
             $content.data('data-id', '');
             $('textarea').each(function() {
                 autosize($(this));
@@ -772,6 +876,9 @@ define(function(require, exports, module) {
                 }).done(function(response) {
                     if (!response.errno) {
                         $tr.remove();
+                        options.sortlist = _.reject(options.sortlist, function(item) {
+                            return item.id == id;
+                        });
                         notify({
                             text: '删除成功。'
                         });
@@ -789,6 +896,40 @@ define(function(require, exports, module) {
                 //delete new item which is not saved
                 $tr.remove();
             }
+            return false;
+        },
+        _sortSave: function(event) {
+            var self = this,
+                options = this.options,
+                $list = this.element.find('#module-modal-sort-list'),
+                $cancel = this.element.find('#module-modal-sort').find('button.sort-cancel'),
+                data = {};
+            $list.children('li').each(function(index, value) {
+                var id = $(this).attr('data-id');
+                data[id] = index + 1;
+            });
+
+            $.ajax({
+                url: options.smapupdate,
+                data: {
+                    m_code: options.m_code,
+                    parent_id: options.parent_id,
+                    map_value: JSON.stringify(data)
+                }
+            }).done(function(res) {
+                if (!res.errno) {
+                    $cancel.trigger('click');
+                    self.reRender();
+                } else {
+                    notify({
+                        text: res.error
+                    });
+                }
+            }).fail(function() {
+                notify({
+                    text: '保存失败，请稍后再试。'
+                });
+            });
             return false;
         },
         _dataSave: function(event) {
@@ -830,6 +971,7 @@ define(function(require, exports, module) {
             });
 
             dataStr = JSON.stringify(data);
+            self.element.find('#module-modal-data').find('button.data-cancel').trigger('click');
 
             if ((options.parent_id == 0) && (!id)) {
                 if (data['ukey'] && _util.validateId(data['ukey'])) {
@@ -858,7 +1000,6 @@ define(function(require, exports, module) {
                             $ukey.text(data['ukey']);
                             $modal_ukey.data('data', dataStr);
                             self.element.find('#notify-ukey').trigger('click');
-                            self.element.find('#module-modal-data').find('button.data-cancel').trigger('click');
                         }
                     });
                 } else {
@@ -920,7 +1061,7 @@ define(function(require, exports, module) {
                             } else {
                                 $content.append(self._createItemElem(item));
                             }
-
+                            options.sortlist.push(item);
                         }
                         self.element.find('button.data-cancel').trigger('click');
                     }

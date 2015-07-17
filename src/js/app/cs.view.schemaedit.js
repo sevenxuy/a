@@ -14,7 +14,8 @@ define(function(require, exports, module) {
             typeSelectData: ['text', 'link', 'boolean', 'image', 'select', 'time'],
             keysExcept: ['depth', 'list', 'root_id', 'update_time'],
             allContentKeys: [],
-            schema_extend: {}
+            schema_extend: {},
+            sum_limit: 60
         },
         _create: function() {
             this.render();
@@ -220,7 +221,7 @@ define(function(require, exports, module) {
             h.push('</div>');
             h.push('<div class="modal-footer">');
             h.push('<button type="button" class="btn btn-mini btn-default schema-modal-content-item-cancel" data-dismiss="modal">取消</button>');
-            h.push('<button type="button" class="btn btn-mini btn-primary schema-modal-content-item-save">添加</button>');
+            h.push('<button type="button" class="btn btn-mini btn-primary schema-modal-content-item-save">保存</button>');
             h.push('</div>');
             h.push('</div></div></div>');
             return h.join('');
@@ -254,9 +255,9 @@ define(function(require, exports, module) {
                     key: 'select_import'
                 })['value'] + '</textarea></td></tr>');
                 //TODO h.push('<tr><td>valid_check</td><td>有效性检查</td><td><textarea></textarea></td></tr>');
-                h.push('<tr><td>sum_limit</td><td>条目限数</td><td><div class="table_err hide"></div><input id="plugin-list-sum_limit" type="text" value="' + _.findWhere(list, {
+                h.push('<tr><td>sum_limit</td><td>条目限数</td><td><div class="table_tip">提示：sum_limit值必须为不大于60的正整数。</div><div class="table_err hide"></div><input id="plugin-list-sum_limit" type="text" value="' + (_.findWhere(list, {
                     key: 'sum_limit'
-                })['value'] + '"/></td></tr>');
+                })['value'] || options.sum_limit) + '"/></td></tr>');
                 h.push('<tr><td colspan="3" class="table-header-item">For Item</td></tr>');
                 h.push('<tr><td>preview</td><td>预览</td><td><div class="table_err hide"></div><textarea id="plugin-item-preview">' + _.findWhere(item, {
                     key: 'preview'
@@ -267,7 +268,7 @@ define(function(require, exports, module) {
                 h.push('</td></tr>');
                 h.push('<tr><td>select_import</td><td>选择添加</td><td><div class="table_err hide"></div><textarea id="plugin-list-select_import"></textarea></td></tr>');
                 //TODO h.push('<tr><td>valid_check</td><td>有效性检查</td><td><textarea></textarea></td></tr>');
-                h.push('<tr><td>sum_limit</td><td>条目限数</td><td><div class="table_err hide"></div><input id="plugin-list-sum_limit" type="text" /></td></tr>');
+                h.push('<tr><td>sum_limit</td><td>条目限数</td><td><div class="table_tip">提示：sum_limit值必须为不大于60的正整数。</div><div class="table_err hide"></div><input id="plugin-list-sum_limit" type="text" value="' + options.sum_limit + '"/></td></tr>');
                 h.push('<tr><td colspan="3" class="table-header-item">For Item</td></tr>');
                 h.push('<tr><td>preview</td><td>预览</td><td><div class="table_err hide"></div><textarea id="plugin-item-preview"></textarea></td></tr>');
             }
@@ -275,14 +276,15 @@ define(function(require, exports, module) {
             h.push('</div>');
             h.push('<div class="modal-footer">');
             h.push('<button type="button" class="btn btn-mini btn-default schema-modal-plugin-cancel" data-dismiss="modal">取消</button>');
-            h.push('<button type="button" class="btn btn-mini btn-primary schema-modal-plugin-save">确定</button>');
+            h.push('<button type="button" class="btn btn-mini btn-primary schema-modal-plugin-save">保存</button>');
             h.push('</div>');
             h.push('</div></div></div>');
             //-- schema plugins modal ends
             return h.join('');
         },
         _createSchemaPluginElem: function(plugin) {
-            var list = plugin.list,
+            var options = this.options,
+                list = plugin.list,
                 item = plugin.item,
                 h = [];
             h.push('<tr><td colspan="3" class="table-header-item">For List</td></tr>');
@@ -293,9 +295,9 @@ define(function(require, exports, module) {
                 key: 'select_import'
             }).value + '</td></tr>');
             //TODO h.push('<tr><td>valid_check</td><td>有效性检查</td><td><textarea></textarea></td></tr>');
-            h.push('<tr><td>sum_limit</td><td>条目限数</td><td>' + _.findWhere(list, {
+            h.push('<tr><td>sum_limit</td><td>条目限数</td><td>' + (_.findWhere(list, {
                 key: 'sum_limit'
-            }).value + '</td></tr>');
+            }).value || options.sum_limit) + '</td></tr>');
             h.push('<tr><td colspan="3" class="table-header-item">For Item</td></tr>');
             h.push('<tr><td>preview</td><td>预览</td><td>' + _.findWhere(item, {
                 key: 'preview'
@@ -420,7 +422,7 @@ define(function(require, exports, module) {
                 } else {
                     notify({
                         tmpl: 'error',
-                        text: response.error
+                        text: res.error
                     });
                 }
             }).fail(function(res) {
@@ -672,8 +674,13 @@ define(function(require, exports, module) {
             }
             if (!!sum_limit) {
                 if (!_util.validateNum(sum_limit)) {
-                    $sum_limit.closest('td').find('div.table_err').html('请留空或输入正整数。').removeClass('hide');
+                    $sum_limit.closest('td').find('div.table_err').html('请留空或输入小于' + options.sum_limit + '的正整数。').removeClass('hide');
                     stop = true;
+                } else {
+                    if (parseInt(sum_limit, 10) > options.sum_limit) {
+                        $sum_limit.closest('td').find('div.table_err').html('请输入小于' + options.sum_limit + '的正整数。').removeClass('hide');
+                        stop = true;
+                    }
                 }
             }
             if (!!preview) {
@@ -702,7 +709,7 @@ define(function(require, exports, module) {
                 }, {
                     key: 'sum_limit',
                     name: '条目限数',
-                    value: sum_limit
+                    value: sum_limit || '0'
                 }],
                 item: [{
                     key: 'preview',

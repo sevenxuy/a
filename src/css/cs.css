@@ -402,3 +402,30 @@ input[type=text] {
 .col-xs-12 {
     margin-top: 50px;
 }
+/*sort*/
+
+.large-modal-dialog {
+    width: 860px;
+}
+
+.ui-sortable {
+    cursor: default;
+}
+
+.draggable-placeholder {
+    height: 40px;
+}
+
+.item-list>li>span {
+    text-align: center;
+    display: inline-block;
+    word-break: break-all;
+}
+
+.item-list>li>span:first-child {
+    width: 6%;
+}
+
+span.sortable-more {
+    width: 6%;
+}
