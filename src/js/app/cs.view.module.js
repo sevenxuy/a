@@ -28,7 +28,7 @@ define(function(require, exports, module) {
             limit_cols: 5,
             is_sorted: false,
             // sum_limit: 60,
-            is_added: false,
+            is_added: true,
             is_select_import: false
         },
         _create: function() {
@@ -102,29 +102,32 @@ define(function(require, exports, module) {
                 schema_content = options.schema_content,
                 path = options.path;
             if (schema_content && (!_.isNull(schema_content)) && (!_.isEmpty(schema_content))) {
-                //-- settings begins
+                //-- settings update begins
                 //only when there is schema_content there is schema_extend;
+                //if no schema_extend.plugin, settings will not change but remaind the same as in init options;
                 //Sort only for data whose is_sorted value in schema_extend.plugin.list is 1 (true);
                 //Sort not for data whose parent_id is 0;
-                if (options.parent_id != 0) {
-                    options.is_sorted = options.schema_extend && options.schema_extend.plugin && options.schema_extend.plugin.list && (_.findWhere(options.schema_extend.plugin.list, {
-                        key: 'is_sorted'
-                    })['value'] == 1);
-                    options.sum_limit = parseInt(options.schema_extend && options.schema_extend.plugin && options.schema_extend.plugin.list && _.findWhere(options.schema_extend.plugin.list, {
-                        key: 'sum_limit'
-                    })['value'] || '0', 10);
-                    options.is_added = (options.sum_limit == 0) ? true : options.sum_limit > options.total;
-                    options.is_select_import = options.schema_extend && options.schema_extend.plugin && options.schema_extend.plugin.list && (_.findWhere(options.schema_extend.plugin.list, {
-                        key: 'select_import'
-                    })['value']).length || options.is_select_import;
-                    console.log(options.schema_extend, options.schema_extend.plugin, options.schema_extend.plugin.list);
-                    if (options.is_select_import) {
-                        options.select_import = _.findWhere(options.schema_extend.plugin.list, {
+                if (options.parent_id != 0 && options.schema_extend && options.schema_extend.plugin) {
+                    if (options.schema_extend.plugin.list) {
+                        options.is_sorted = (_.findWhere(options.schema_extend.plugin.list, {
+                            key: 'is_sorted'
+                        })['value'] == 1);
+                        options.sum_limit = parseInt(_.findWhere(options.schema_extend.plugin.list, {
+                            key: 'sum_limit'
+                        })['value'] || '0', 10);
+                        options.is_added = (options.sum_limit == 0) ? true : options.sum_limit > options.total;
+                        options.is_select_import = (_.findWhere(options.schema_extend.plugin.list, {
                             key: 'select_import'
-                        })['value'];
+                        })['value']).length || options.is_select_import;
+                        if (options.is_select_import) {
+                            options.select_import = _.findWhere(options.schema_extend.plugin.list, {
+                                key: 'select_import'
+                            })['value'];
+                        }
                     }
+                    if (options.schema_extend.plugin.item) {}
                 }
-                //-- settings ends 
+                //-- settings update ends 
                 h.push('<div class="breadcrumbs">');
                 h.push('<div class="breadcrumbs-content" data-rel="tooltip"><ul class="breadcrumb">');
                 if (_.isEmpty(path)) {
