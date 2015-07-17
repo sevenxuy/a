@@ -27,7 +27,7 @@ define(function(require, exports, module) {
             limit: 60,
             limit_cols: 5,
             is_sorted: false,
-            sum_limit: 60,
+            // sum_limit: 60,
             is_added: false,
             is_select_import: false
         },
@@ -69,20 +69,23 @@ define(function(require, exports, module) {
                             options.sortlist = data.data;
                             //Sort only for data whose is_sorted value in schema_extend.plugin.list is 1 (true);
                             //Sort not for data whose parent_id is 0;
-                            options.is_sorted = options.schema_extend && options.schema_extend.plugin && options.schema_extend.plugin.list && (_.findWhere(options.schema_extend.plugin.list, {
-                                key: 'is_sorted'
-                            })['value'] == 1) && (options.parent_id != 0);
-                            options.sum_limit = parseInt(options.schema_extend && options.schema_extend.plugin && options.schema_extend.plugin.list && _.findWhere(options.schema_extend.plugin.list, {
-                                key: 'sum_limit'
-                            })['value'] || options.sum_limit, 10);
-                            options.is_added = options.sum_limit > options.total;
-                            options.is_select_import = options.schema_extend && options.schema_extend.plugin && options.schema_extend.plugin.list && (_.findWhere(options.schema_extend.plugin.list, {
-                                key: 'select_import'
-                            })['value']).length || options.is_select_import;
-                            if (options.is_select_import) {
-                                options.select_import = _.findWhere(options.schema_extend.plugin.list, {
+                            if (options.parent_id != 0) {
+                                options.is_sorted = options.schema_extend && options.schema_extend.plugin && options.schema_extend.plugin.list && (_.findWhere(options.schema_extend.plugin.list, {
+                                    key: 'is_sorted'
+                                })['value'] == 1);
+                                options.sum_limit = parseInt(options.schema_extend && options.schema_extend.plugin && options.schema_extend.plugin.list && _.findWhere(options.schema_extend.plugin.list, {
+                                    key: 'sum_limit'
+                                })['value'] || '0', 10);
+                                options.is_added = (options.sum_limit == 0) ? true : options.sum_limit > options.total;
+                                options.is_select_import = options.schema_extend && options.schema_extend.plugin && options.schema_extend.plugin.list && (_.findWhere(options.schema_extend.plugin.list, {
                                     key: 'select_import'
-                                })['value'];
+                                })['value']).length || options.is_select_import;
+                                console.log(options.schema_extend, options.schema_extend.plugin, options.schema_extend.plugin.list);
+                                if (options.is_select_import) {
+                                    options.select_import = _.findWhere(options.schema_extend.plugin.list, {
+                                        key: 'select_import'
+                                    })['value'];
+                                }
                             }
                             self._createModuleElem(data.data);
                             var setting = {
@@ -162,7 +165,7 @@ define(function(require, exports, module) {
                 }
                 h.push('<div id="module-pagingbar"></div>');
                 h.push('</div>');
-                h.push(this._createModalDataElem());
+
 
                 //-- ukey modal begins
                 if (options.parent_id == 0) {
@@ -215,36 +218,42 @@ define(function(require, exports, module) {
             if (options.parent_id != 0) {
                 this._createModalSortElem();
             }
+            this._createModalDataElem();
+            this._createModalImportElem();
         },
         _createTableToolElem: function() {
             var options = this.options,
                 schema_content = options.schema_content,
                 h = [];
             h.push('<div class="table-tool">');
-            if (options.is_select_import) {
-                h.push('<button class="btn btn-mini btn-pink data-import" data-toggle="modal" data-target="#module-modal-import">导入</button>');
-            }
-            if (options.is_sorted) {
-                h.push('<button class="btn btn-mini btn-info data-sort" data-toggle="modal" data-target="#module-modal-sort">排序</button>');
-            }
-            if (options.is_added) {
-                h.push('<button class="btn btn-mini btn-success data-add hide" data-toggle="modal" data-target="#module-modal-data"><i class="fa fa-plus"></i> 新增</button>');
-            }
-            if (schema_content && (schema_content.length > options.limit_cols)) {
-                //-- btn-cols-list begins
-                h.push('<div class="btn-group hide">');
-                h.push('<button data-toggle="dropdown" class="btn btn-mini btn-yellow dropdown-toggle" aria-expanded="false">显示列 <i class="ace-icon fa fa-angle-down icon-on-right"></i></button>');
-                h.push('<ul class="dropdown-menu dropdown-menu-right dropdown-alert btn-cols-list">');
-                _.each(schema_content, function(schema_item, schema_index) {
-                    if (schema_index > options.limit_cols - 1) {
-                        h.push('<li data-key="' + schema_item.key + '"><a><i class="fa"></i> ' + schema_item.desc + '</a></li>');
-                    } else {
-                        h.push('<li data-key="' + schema_item.key + '"><a><i class="fa fa-check"></i> ' + schema_item.desc + '</a></li>');
-                    }
-                });
-                h.push('</ul>');
-                h.push('</div>');
-                //-- btn-cols-list ends
+            if (options.parent_id == 0) {
+                h.push('<button class="btn btn-mini btn-success data-add" data-toggle="modal" data-target="#module-modal-data"><i class="fa fa-plus"></i> 新增</button>');
+            } else {
+                if (options.is_select_import) {
+                    h.push('<button class="btn btn-mini btn-pink data-import" data-toggle="modal" data-target="#module-modal-import">导入</button>');
+                }
+                if (options.is_sorted) {
+                    h.push('<button class="btn btn-mini btn-info data-sort" data-toggle="modal" data-target="#module-modal-sort">排序</button>');
+                }
+                if (options.is_added) {
+                    h.push('<button class="btn btn-mini btn-success data-add" data-toggle="modal" data-target="#module-modal-data"><i class="fa fa-plus"></i> 新增</button>');
+                }
+                if (schema_content && (schema_content.length > options.limit_cols)) {
+                    //-- btn-cols-list begins
+                    h.push('<div class="btn-group">');
+                    h.push('<button data-toggle="dropdown" class="btn btn-mini btn-yellow dropdown-toggle" aria-expanded="false">显示列 <i class="ace-icon fa fa-angle-down icon-on-right"></i></button>');
+                    h.push('<ul class="dropdown-menu dropdown-menu-right dropdown-alert btn-cols-list">');
+                    _.each(schema_content, function(schema_item, schema_index) {
+                        if (schema_index > options.limit_cols - 1) {
+                            h.push('<li data-key="' + schema_item.key + '"><a><i class="fa"></i> ' + schema_item.desc + '</a></li>');
+                        } else {
+                            h.push('<li data-key="' + schema_item.key + '"><a><i class="fa fa-check"></i> ' + schema_item.desc + '</a></li>');
+                        }
+                    });
+                    h.push('</ul>');
+                    h.push('</div>');
+                    //-- btn-cols-list ends
+                }
             }
             h.push('</div>');
             return h.join('');
@@ -269,7 +278,7 @@ define(function(require, exports, module) {
         },
         _createModalSortElem: function() {
             var h = [];
-            //-- data item modal begins
+            //-- sort modal begins
             h.push('<div class="modal fade" id="module-modal-sort" tabindex="-1" role="dialog" aria-hidden="true"><div class="modal-dialog large-modal-dialog"><div class="modal-content">');
             h.push('<div class="modal-header">');
             h.push('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
@@ -289,7 +298,7 @@ define(function(require, exports, module) {
             h.push('<button type="button" class="btn btn-mini btn-primary sort-save">保存</button>');
             h.push('</div>');
             h.push('</div></div></div>');
-            //-- data item modal ends
+            //-- sort modal ends
             this.element.append(h.join(''));
             //Android's default browser somehow is confused when tapping on label which will lead to dragging the task
             //so disable dragging when clicking on label
@@ -334,7 +343,28 @@ define(function(require, exports, module) {
             h.push('</div>');
             h.push('</div></div></div>');
             //-- data item modal ends
-            return h.join('');
+            this.element.append(h.join(''));
+        },
+        _createModalImportElem: function() {
+            var h = [];
+            //-- import modal begins
+            h.push('<div class="modal fade" id="module-modal-import" tabindex="-1" role="dialog" aria-hidden="true"><div class="modal-dialog large-modal-dialog"><div class="modal-content">');
+            h.push('<div class="modal-header">');
+            h.push('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
+            h.push('<h4 class="modal-title" id="module-modal-import-title">导入</h4>');
+            h.push('</div>');
+            h.push('<div class="modal-body">');
+            h.push('<div id="module-modal-import-error" class="table_err hide"></div>');
+            h.push('<div id="module-modal-import-loading" class="cs-loading"><div class="cs-loadingico"></div><span>正在加载 ...</span></div>');
+            h.push('<div id="module-modal-import-content"></div>');
+            h.push('</div>');
+            h.push('<div class="modal-footer">');
+            h.push('<button type="button" class="btn btn-mini btn-default import-cancel" data-dismiss="modal">取消</button>');
+            h.push('<button type="button" class="btn btn-mini btn-primary import-save">保存</button>');
+            h.push('</div>');
+            h.push('</div></div></div>');
+            //-- import modal ends
+            this.element.append(h.join(''));
         },
         _createSchemaSelectElem: function(data) {
             var options = this.options,
@@ -365,11 +395,12 @@ define(function(require, exports, module) {
             h.push('</tbody></table>');
             h.push('<div class="cs-nomoredata">没有更多数据</div>');
             h.push('</div>');
-            h.push(this._createModalDataElem());
+
             this.element.addClass('hide').empty().append(h.join('')).removeClass('hide');
             this.element.find('div.breadcrumbs').css({
                 'width': this.element.width()
             });
+            this._createModalDataElem();
         },
         _createBlankElem: function() {
             var self = this,
@@ -396,7 +427,7 @@ define(function(require, exports, module) {
             h.push('</tbody></table>');
             h.push('<div class="cs-nomoredata">没有更多数据</div>');
             h.push('</div>');
-            h.push(this._createModalDataElem());
+
             this.element.addClass('hide').empty().append(h.join('')).removeClass('hide');
             if (schema_content && (schema_content.length > options.limit_cols)) {
                 this._initCols();
@@ -404,6 +435,7 @@ define(function(require, exports, module) {
             this.element.find('div.breadcrumbs').css({
                 'width': this.element.width()
             });
+            this._createModalDataElem();
         },
         _createItemElem: function(item) {
             var self = this,
@@ -509,6 +541,7 @@ define(function(require, exports, module) {
         },
         _bindEvents: function() {
             this._on(this.element, {
+                'click button.data-import': this._dataImportElem,
                 'click button.data-sort': this._dataSortElem,
                 'click button.data-add': this._dataAddElem,
                 'click a.data-audit': this._dataAudit,
@@ -571,6 +604,71 @@ define(function(require, exports, module) {
             options.schema_content = $.parseJSON(options.schema_map[options.schema_code]);
             this._createBlankElem();
             return false;
+        },
+        _dataImportElem: function() {
+            var self = this,
+                options = this.options,
+                schema_content = options.schema_content,
+                schema_code = options.schema_code,
+                h = [],
+                $err = this.element.find('#module-modal-import-error'),
+                $loading = this.element.find('#module-modal-import-loading'),
+                $content = this.element.find('#module-modal-import-content');
+            $.ajax({
+                url: options.select_import + '&fn=?',
+                crossDomain: true,
+                dataType: 'json'
+            }).done(function(res) {
+                if (!res.errno) {
+
+                    var datalist = res.data.stream_data;
+                    if (!_.isEmpty(datalist)) {
+                        _.each(datalist, function(item, index) {
+                            h.push('<tr>');
+                            h.push('<td>' + item.id || '' + '</td>');
+                            _.each(schema_content, function(schema_item, schema_index) {
+                                h.push('<td data-key="' + schema_item.key + '" data-type="' + schema_item.type + '" data-value="' + (item[schema_item.key] || '') + '">');
+                                switch (schema_item.type) {
+                                    case 'select':
+                                        h.push('' + options['select_' + schema_item.key][item[schema_item.key]] + '');
+                                        break;
+                                    case 'image':
+                                        if (!!item[schema_item.key]) {
+                                            h.push('<a href="' + (item[schema_item.key] || '') + '"><img class="snapshot" src="' + (item[schema_item.key][0] || '') + '" /></a>');
+                                        } else {
+                                            h.push('');
+                                        }
+                                        break;
+                                    case 'link':
+                                        h.push('<a href="' + (item[schema_item.key] || '') + '"><span>' + (item[schema_item.key] || '') + '</span></a>');
+                                        break;
+                                    case 'boolean':
+                                        if (item[schema_item.key] == '1') {
+                                            h.push('YES');
+                                        } else {
+                                            h.push('NO');
+                                        }
+                                        break;
+                                    case 'time':
+                                    default:
+                                        h.push(item[schema_item.key] || '');
+                                }
+                                h.push('</td>');
+                            });
+                            h.push('</tr>');
+                        });
+                        $content.addClass('hide').empty().append(h.join('')).removeClass('hide');
+                    } else {
+                        $err.html('没有数据。').removeClass('hide');
+                    }
+                } else {
+                    $err.html(res.error).removeClass('hide');
+                }
+            }).fail(function(res) {
+                $err.html('数据加载失败，请稍后再试。').removeClass('hide');
+            }).always(function() {
+                $loading.addClass('hide');
+            });
         },
         _dataSortElem: function() {
             var self = this,

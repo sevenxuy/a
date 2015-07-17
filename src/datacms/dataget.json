@@ -1,34 +1,24 @@
 {
     "errno": 0,
     "error": "",
-    "fingerprint": "0.0079",
+    "fingerprint": "0.0192",
     "data": {
         "data": [{
-            "id": "34",
-            "data": "{\"ukey\":\"ceshi\",\"ukey_brief\":\"\\u8bd5\\u4e00\\u8bd5\"}",
-            "schema_code": "root_schema",
-            "status": "5",
-            "update_time": "2015-06-15 16:39:24"
-        }, {
-            "id": "33",
-            "data": "{\"ukey\":\"ceshi\",\"ukey_brief\":\"\\u6d4b\\u8bd5\"}",
-            "schema_code": "root_schema",
-            "status": "5",
-            "update_time": "2015-06-12 17:58:51"
-        }, {
-            "id": "1",
-            "data": "{\"ukey\":\"demo\",\"ukey_brief\":\"\\u6d4b\\u8bd5\\u6837\\u4f8b,\\u8bf7\\u4e0d\\u8981\\u968f\\u610f\\u4fee\\u6539\"}",
-            "schema_code": "root_schema",
-            "status": "5",
-            "update_time": "2015-07-15 13:10:29"
+            "id": "153",
+            "data": "{\"bdsourcdid\":\"\",\"categoryid\":\"1\",\"date\":\"2015-07-11 11:04:00\",\"docid\":\"9967148432943419801\",\"image\":\"http:\\\/\\\/111.13.100.56:8080\\\/reader\\\/image\\\/pool\\\/a\\\/0\\\/5\\\/a05f35fd1a837755cc3c1c89390c600f.jpg\",\"imgwidth\":\"371\",\"imgheight\":\"550\",\"index\":\"2162\",\"keyword\":\"\",\"link\":\"http:\\\/\\\/yule.sohu.com\\\/20150711\\\/n416582065.shtml\",\"source\":\"\\u641c\\u72d0\\u5a31\\u4e50\",\"summary\":\"\\u88ab\\u95ee\\u751f\\u5b50\\u6253\\u7b97\\u65f6\\uff0cELLA\\u8868\\u793a\\u9274\\u4e8e\\u81ea\\u5bb6\\u6709\\u597d\\u57fa\\u56e0\\u5e0c\\u671b\\u660e\\u5e74\\u53ef\\u4ee5\\u751f\\u4e00\\u4e2a\\u53cc\\u80de\\u80ce\\u6216\\u8005\\u9f99\\u51e4\\u80ce\\uff0c\\u900f\\u9732\\u660e\\u5e74\\u624d\\u4f1a\\u8c03\\u7406\\u8eab\\u4f53\\uff0c\\u5148\\u91c7\\u7528\\u81ea\\u7136\\u53d7\\u5b55\\u7684\\u65b9\\u5f0f,\\u5982\\u679c\\u4e0d\\u884c\\u518d\\u53bb\\u770b\\u540d\\u533b\\u3002\",\"title\":\"ELLA\\u7740\\u6025\\u660e\\u5e74\\u6000\\u5b55\\uff1a\\u5982\\u679c\\u4e0d\\u884c\\u5c31\\u53bb\\u770b\\u540d\\u533b\",\"weight\":\"99\",\"listcount\":\"0\",\"zancount\":\"0\",\"validtime\":\"2015-07-12 16:00:40\",\"invalidtime\":\"2015-07-18 15:47:45\",\"texttag\":\"\",\"imgtag\":\"\"}",
+            "schema_code": "box_rss_top_new",
+            "status": "5"
         }],
-        "total": 3,
-        "schema_code": "root_schema",
-        "schema_content": "[{\"key\":\"ukey\",\"desc\":\"\\u552f\\u4e00\\u6807\\u8bc6\\u53f7\",\"type\":\"text\",\"regx\":\"\",\"default\":\"\",\"editable\":1,\"is_index\":1},{\"key\":\"ukey_brief\",\"desc\":\"\\u552f\\u4e00\\u6807\\u8bc6\\u63cf\\u8ff0\",\"type\":\"text\",\"regx\":\"\",\"default\":\"\",\"editable\":1,\"is_index\":\"\"}]",
-        "parent_id": "0",
-        "m_code": "act",
-        "path": [],
-        "extend": "null",
+        "total": 1,
+        "schema_code": "box_rss_top_new",
+        "schema_content": "[{\"key\":\"docid\",\"desc\":\"\u552f\u4e00\u6807\u8bc6\",\"type\":\"text\",\"regx\":\"\",\"editable\":\"1\",\"default\":\"\",\"is_index\":\"\"},{\"key\":\"images\",\"desc\":\"\u56fe\u7247\",\"type\":\"image\",\"regx\":\"\",\"editable\":\"1\",\"default\":\"\",\"is_index\":\"\"},{\"key\":\"link\",\"desc\":\"URL\",\"type\":\"link\",\"regx\":\"\",\"editable\":\"1\",\"default\":\"\",\"is_index\":\"\"},{\"key\":\"source\",\"desc\":\"\u6765\u6e90\",\"type\":\"text\",\"regx\":\"\",\"editable\":\"1\",\"default\":\"\",\"is_index\":\"\"},{\"key\":\"summary\",\"desc\":\"\u6458\u8981\",\"type\":\"text\",\"regx\":\"\",\"editable\":\"1\",\"default\":\"\",\"is_index\":\"\"},{\"key\":\"title\",\"desc\":\"\u6807\u9898\",\"type\":\"text\",\"regx\":\"\",\"editable\":\"1\",\"default\":\"\",\"is_index\":\"\"},{\"key\":\"validtime\",\"desc\":\"\u751f\u6548\u65f6\u95f4\",\"type\":\"time\",\"regx\":\"\",\"editable\":\"1\",\"default\":\"\",\"is_index\":\"\"},{\"key\":\"invalidtime\",\"desc\":\"\u5931\u6548\u65f6\u95f4\",\"type\":\"time\",\"regx\":\"\",\"editable\":\"1\",\"default\":\"\",\"is_index\":\"\"},{\"key\":\"texttag\",\"desc\":\"\u6587\u672ctag\",\"type\":\"text\",\"regx\":\"\",\"editable\":\"1\",\"default\":\"\",\"is_index\":\"\"},{\"key\":\"imgtag\",\"desc\":\"\u56fe\u7247tag\",\"type\":\"image\",\"regx\":\"\",\"editable\":\"1\",\"default\":\"\",\"is_index\":\"\"}]",
+        "parent_id": "152",
+        "m_code": "dreamworks",
+        "path": [{
+            "id": "152",
+            "depth": "0"
+        }],
+        "schema_extend": "{\"plugin\":{\"list\":[{\"key\":\"is_sorted\",\"name\":\"\\u662f\\u5426\\u6392\\u5e8f\",\"value\":\"1\"},{\"key\":\"select_import\",\"name\":\"\\u9009\\u62e9\\u6dfb\\u52a0\",\"value\":\"http:\\\/\\\/uil.cbs.baidu.com\\\/rssfeed\\\/fetch?type=entry_list&channel=ZE_0&dir=up&num=30&ua=bd_720_1280_HTC-HTC+One+X-4-0-4_5-6-6-1_j2&cuid=52BC5DA2D9C9D8A69B6F2B18E7BC47E0%7C318347550599352\"},{\"key\":\"valid_check\",\"name\":\"\\u6709\\u6548\\u6027\\u68c0\\u67e5\",\"value\":\"\"},{\"key\":\"sum_limit\",\"name\":\"\\u6761\\u76ee\\u9650\\u6570\",\"value\":\"60\"}],\"item\":[{\"key\":\"preview\",\"name\":\"\\u9884\\u89c8\",\"value\":\"\"}]}}",
         "use_acl": {
             "role": "9",
             "module_acl": "{}"

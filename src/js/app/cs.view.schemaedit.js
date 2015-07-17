@@ -255,9 +255,15 @@ define(function(require, exports, module) {
                     key: 'select_import'
                 })['value'] + '</textarea></td></tr>');
                 //TODO h.push('<tr><td>valid_check</td><td>有效性检查</td><td><textarea></textarea></td></tr>');
-                h.push('<tr><td>sum_limit</td><td>条目限数</td><td><div class="table_tip">提示：sum_limit值必须为不大于60的正整数。</div><div class="table_err hide"></div><input id="plugin-list-sum_limit" type="text" value="' + (_.findWhere(list, {
+                h.push('<tr><td>sum_limit</td><td>条目限数</td><td>');
+                h.push('<div class="table_tip">提示：<br>1.sum_limit值必须为不大于60的正整数，且仅当is_sorted值为NO时有效。<br/>2.若is_sorted值为YES，此处必须留空。</div><div class="table_err hide"></div>');
+                h.push('<input id="plugin-list-sum_limit" type="text" value="' + (_.findWhere(list, {
+                    key: 'is_sorted'
+                })['value'] == 1 ? '' : (_.findWhere(list, {
                     key: 'sum_limit'
-                })['value'] || options.sum_limit) + '"/></td></tr>');
+                })['value'])) + '" ' + (_.findWhere(list, {
+                    key: 'is_sorted'
+                })['value'] == 1 ? 'readonly="readonly"' : '') + '/></td></tr>');
                 h.push('<tr><td colspan="3" class="table-header-item">For Item</td></tr>');
                 h.push('<tr><td>preview</td><td>预览</td><td><div class="table_err hide"></div><textarea id="plugin-item-preview">' + _.findWhere(item, {
                     key: 'preview'
@@ -268,7 +274,9 @@ define(function(require, exports, module) {
                 h.push('</td></tr>');
                 h.push('<tr><td>select_import</td><td>选择添加</td><td><div class="table_err hide"></div><textarea id="plugin-list-select_import"></textarea></td></tr>');
                 //TODO h.push('<tr><td>valid_check</td><td>有效性检查</td><td><textarea></textarea></td></tr>');
-                h.push('<tr><td>sum_limit</td><td>条目限数</td><td><div class="table_tip">提示：sum_limit值必须为不大于60的正整数。</div><div class="table_err hide"></div><input id="plugin-list-sum_limit" type="text" value="' + options.sum_limit + '"/></td></tr>');
+                h.push('<tr><td>sum_limit</td><td>条目限数</td><td>');
+                h.push('<div class="table_tip">提示：<br>1.sum_limit值必须为不大于60的正整数，且仅当is_sorted值为NO时有效。<br/>2.若is_sorted值为YES，此处必须留空。</div><div class="table_err hide"></div>');
+                h.push('<input id="plugin-list-sum_limit" type="text" value="' + options.sum_limit + '"/></td></tr>');
                 h.push('<tr><td colspan="3" class="table-header-item">For Item</td></tr>');
                 h.push('<tr><td>preview</td><td>预览</td><td><div class="table_err hide"></div><textarea id="plugin-item-preview"></textarea></td></tr>');
             }
@@ -296,8 +304,10 @@ define(function(require, exports, module) {
             }).value + '</td></tr>');
             //TODO h.push('<tr><td>valid_check</td><td>有效性检查</td><td><textarea></textarea></td></tr>');
             h.push('<tr><td>sum_limit</td><td>条目限数</td><td>' + (_.findWhere(list, {
+                key: 'is_sorted'
+            }).value == 1 ? '' : (_.findWhere(list, {
                 key: 'sum_limit'
-            }).value || options.sum_limit) + '</td></tr>');
+            }).value) || '') + '</td></tr>');
             h.push('<tr><td colspan="3" class="table-header-item">For Item</td></tr>');
             h.push('<tr><td>preview</td><td>预览</td><td>' + _.findWhere(item, {
                 key: 'preview'
@@ -383,7 +393,8 @@ define(function(require, exports, module) {
                 'change textarea.schema-modal-content-item-regx': this._updateDefaultElem,
                 'click button.upload-img-btn': this._uploadFile,
                 'change input[type=file]': this._uploadImage,
-                'change textarea.upload-img-tx': this._previewImg
+                'change textarea.upload-img-tx': this._previewImg,
+                'change #plugin-list-is_sorted': this._changeSumLimit
             });
         },
         _dataSave: function() {
@@ -709,7 +720,7 @@ define(function(require, exports, module) {
                 }, {
                     key: 'sum_limit',
                     name: '条目限数',
-                    value: sum_limit || '0'
+                    value: sum_limit
                 }],
                 item: [{
                     key: 'preview',
@@ -810,7 +821,21 @@ define(function(require, exports, module) {
         },
         _hasDuplicateKeys: function(keys) {
             return _.uniq(keys).length !== keys.length
+        },
+        _changeSumLimit: function(event) {
+            var is_sorted = $(event.target).is(':checked'),
+                $sum_limit = this.element.find('#plugin-list-sum_limit');
+            if (is_sorted) {
+                $sum_limit.attr({
+                    'readonly': 'readonly',
+                });
+                $sum_limit.val('');
+            } else {
+                $sum_limit.removeAttr('readonly');
+                $sum_limit.val('60');
+            }
         }
+
     });
     module.exports = $.cs.schemaedit;
 });
