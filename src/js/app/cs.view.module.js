@@ -28,7 +28,7 @@ define(function(require, exports, module) {
             schema_extend_map: {},
             limit: 60,
             limit_cols: 5,
-            sum_limit: 0,
+            sum_limit: 60,
             is_sorted: false,
             is_added: true,
             is_select_import: false,
@@ -74,7 +74,7 @@ define(function(require, exports, module) {
                             options.is_added = true;
                             options.is_select_import = false;
                             options.is_preview = false;
-                            options.sum_limit = 0;
+                            options.sum_limit = 60;
                             self._createModuleElem(data.data);
                         }
                     } else {
@@ -213,7 +213,7 @@ define(function(require, exports, module) {
                     })['value'] == 1);
                     options.sum_limit = parseInt(_.findWhere(options.schema_extend.plugin.list, {
                         key: 'sum_limit'
-                    })['value'] || '0', 10);
+                    })['value'] || '60', 10);
                     options.is_added = (options.sum_limit == 0) ? true : options.sum_limit > options.total;
                     options.is_select_import = (_.findWhere(options.schema_extend.plugin.list, {
                         key: 'select_import'
@@ -1354,12 +1354,14 @@ define(function(require, exports, module) {
                 data: reqdata
             }).done(function(res) {
                 if (!res.errno) {
-                    var datalist = res.data.data;
-                    _.each(datalist, function(item, index) {
-                        $content.append(self._createItemElem(item));
-                        options.sortlist.push(item);
-                        options.total = options.total + 1;
-                    });
+                    var datalist = res.data;
+                    if (datalist.length) {
+                        _.each(datalist, function(item, index) {
+                            $content.append(self._createItemElem(item));
+                            options.sortlist.push(item);
+                            options.total = options.total + 1;
+                        });
+                    }
                 } else {
                     notify({
                         tmpl: 'error',
