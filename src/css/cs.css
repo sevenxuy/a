@@ -20,10 +20,6 @@ td > span {
     max-height: 48px;
 }
 
-td:first-child {
-    width: 4%;
-}
-
 td[colspan] {
     text-align: center;
 }

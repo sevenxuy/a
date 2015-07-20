@@ -23,7 +23,8 @@ define(function(require, exports, module) {
             ukeyexist: '/ucms/cms/ukeyexist',
             smapupdate: '/ucms/cms/smapupdate',
             schema_content: [],
-            schema_map: {},
+            schema_content_map: {},
+            schema_extend_map: {},
             limit: 60,
             limit_cols: 5,
             is_sorted: false,
@@ -91,31 +92,6 @@ define(function(require, exports, module) {
                 schema_content = options.schema_content,
                 path = options.path;
             if (schema_content && (!_.isNull(schema_content)) && (!_.isEmpty(schema_content))) {
-                //-- settings update begins
-                //only when there is schema_content there is schema_extend;
-                //if no schema_extend.plugin, settings will not change but remaind the same as in init options;
-                //Sort only for data whose is_sorted value in schema_extend.plugin.list is 1 (true);
-                //Sort not for data whose parent_id is 0;
-                if (options.parent_id != 0 && options.schema_extend && options.schema_extend.plugin) {
-                    if (options.schema_extend.plugin.list) {
-                        options.is_sorted = (_.findWhere(options.schema_extend.plugin.list, {
-                            key: 'is_sorted'
-                        })['value'] == 1);
-                        options.sum_limit = parseInt(_.findWhere(options.schema_extend.plugin.list, {
-                            key: 'sum_limit'
-                        })['value'] || '0', 10);
-                        options.is_added = (options.sum_limit == 0) ? true : options.sum_limit > options.total;
-                        options.is_select_import = (_.findWhere(options.schema_extend.plugin.list, {
-                            key: 'select_import'
-                        })['value']).length || options.is_select_import;
-                        if (options.is_select_import) {
-                            options.select_import = _.findWhere(options.schema_extend.plugin.list, {
-                                key: 'select_import'
-                            })['value'];
-                        }
-                    }
-                    if (options.schema_extend.plugin.item) {}
-                }
                 //-- settings update ends 
                 h.push('<div class="breadcrumbs">');
                 h.push('<div class="breadcrumbs-content" data-rel="tooltip"><ul class="breadcrumb">');
@@ -129,7 +105,6 @@ define(function(require, exports, module) {
                     h.push('<li class="active">Data Depth : ' + (parseInt(path[path.length - 1].depth, 10) + 1) + '</li>');
                 }
                 h.push('</ul></div>');
-                h.push(this._createTableToolElem());
                 h.push('</div>');
                 h.push('<div class="col-xs-12">');
                 //data && schema_content
@@ -160,25 +135,18 @@ define(function(require, exports, module) {
                 h.push('<div id="module-pagingbar"></div>');
                 h.push('</div>');
 
-
-                //-- ukey modal begins
                 if (options.parent_id == 0) {
-                    h.push('<button id="notify-ukey" class="hide" data-toggle="modal" data-target="#module-modal-ukey"></button>');
-                    h.push('<div class="modal fade" id="module-modal-ukey" tabindex="-1" role="dialog" aria-hidden="true"><div class="modal-dialog"><div class="modal-content">');
-                    h.push('<div class="modal-header">');
-                    h.push('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
-                    h.push('<h4 class="modal-title">提示</h4>');
-                    h.push('</div>');
-                    h.push('<div class="modal-body">');
-                    h.push('<div>唯一标识号(ukey):<span id="module-modal-body-ukey"></span>库里已存在，确定保存覆盖？</div>');
-                    h.push('</div>');
-                    h.push('<div class="modal-footer">');
-                    h.push('<button type="button" class="btn btn-mini btn-default data-confirm"> 是 </button>');
-                    h.push('<button type="button" class="btn btn-mini btn-primary data-cancel" data-dismiss="modal"> 否 </button>');
-                    h.push('</div>');
-                    h.push('</div></div></div>');
+                    this._createUkeyModalElem();
                 }
-                //-- ukey modal ends
+                this.element.empty().append(h.join(''));
+                this._createTableToolElem();
+
+                if (schema_content && (schema_content.length > options.limit_cols)) {
+                    this._initCols();
+                }
+                this.element.find('div.breadcrumbs').css({
+                    'width': this.element.width()
+                });
             } else {
                 h.push('<div class="breadcrumbs">');
                 h.push('<div class="breadcrumbs-content" data-rel="tooltip"><ul class="breadcrumb">');
@@ -192,29 +160,67 @@ define(function(require, exports, module) {
                     h.push('<li class="active">Data Depth : ' + path[path.length - 1].depth + '</li>');
                 }
                 h.push('</ul></div>');
-                // h.push(this._createTableToolElem());
                 h.push('</div>');
                 h.push('<div class="col-xs-12">');
                 //only show schema add on page
                 h.push('<div>请选择Schema : <span id="data-schema"></span><a class="btn btn-link schema-save">确定</a></div>');
                 self._getSchemaListData();
                 h.push('</div>');
+                this.element.empty().append(h.join(''));
+                this.element.find('div.breadcrumbs').css({
+                    'width': this.element.width()
+                });
             }
-
-            this.element.empty().append(h.join(''));
-            if (schema_content && (schema_content.length > options.limit_cols)) {
-                this._initCols();
+        },
+        _createUkeyModalElem: function() {
+            var options = this.options,
+                h = [];
+            h.push('<button id="notify-ukey" class="hide" data-toggle="modal" data-target="#module-modal-ukey"></button>');
+            h.push('<div class="modal fade" id="module-modal-ukey" tabindex="-1" role="dialog" aria-hidden="true"><div class="modal-dialog"><div class="modal-content">');
+            h.push('<div class="modal-header">');
+            h.push('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
+            h.push('<h4 class="modal-title">提示</h4>');
+            h.push('</div>');
+            h.push('<div class="modal-body">');
+            h.push('<div>唯一标识号(ukey):<span id="module-modal-body-ukey"></span>库里已存在，确定保存覆盖？</div>');
+            h.push('</div>');
+            h.push('<div class="modal-footer">');
+            h.push('<button type="button" class="btn btn-mini btn-default data-confirm"> 是 </button>');
+            h.push('<button type="button" class="btn btn-mini btn-primary data-cancel" data-dismiss="modal"> 否 </button>');
+            h.push('</div>');
+            h.push('</div></div></div>');
+            return h.join('');
+        },
+        _initSettings: function() {
+            var options = this.options;
+            //-- settings update begins
+            //only when there is schema_content there is schema_extend;
+            //if no schema_extend.plugin, settings will not change but remaind the same as in init options;
+            //Sort only for data whose is_sorted value in schema_extend.plugin.list is 1 (true);
+            //Sort not for data whose parent_id is 0;
+            if (options.parent_id != 0 && options.schema_extend && options.schema_extend.plugin) {
+                if (options.schema_extend.plugin.list) {
+                    options.is_sorted = (_.findWhere(options.schema_extend.plugin.list, {
+                        key: 'is_sorted'
+                    })['value'] == 1);
+                    options.sum_limit = parseInt(_.findWhere(options.schema_extend.plugin.list, {
+                        key: 'sum_limit'
+                    })['value'] || '0', 10);
+                    options.is_added = (options.sum_limit == 0) ? true : options.sum_limit > options.total;
+                    options.is_select_import = (_.findWhere(options.schema_extend.plugin.list, {
+                        key: 'select_import'
+                    })['value']).length || options.is_select_import;
+                    if (options.is_select_import) {
+                        options.select_import = _.findWhere(options.schema_extend.plugin.list, {
+                            key: 'select_import'
+                        })['value'];
+                    }
+                }
+                if (options.schema_extend.plugin.item) {}
             }
-            this.element.find('div.breadcrumbs').css({
-                'width': this.element.width()
-            });
-            if (options.parent_id != 0) {
-                this._createModalSortElem();
-            }
-            this._createModalDataElem();
-            this._createModalImportElem();
         },
         _createTableToolElem: function() {
+            this._initSettings();
             var options = this.options,
                 schema_content = options.schema_content,
                 h = [];
@@ -227,19 +233,6 @@ define(function(require, exports, module) {
                 }
                 if (options.is_sorted) {
                     h.push('<button class="btn btn-mini btn-info data-sort" data-toggle="modal" data-target="#module-modal-sort">排序</button>');
-                } else {
-                    var setting = {
-                        limit: options.limit,
-                        totalpages: options.totalpages,
-                        pn: parseInt(options.pn, 10),
-                        routerstr: options.m_code + '/module/' + options.parent_id
-                    };
-                    var $pagingbar = self.element.find('#module-pagingbar');
-                    if ($pagingbar.data('widgetCreated')) {
-                        $pagingbar.pagingbar('reRender', setting);
-                    } else {
-                        $pagingbar.pagingbar(setting);
-                    }
                 }
                 if (options.is_added) {
                     h.push('<button class="btn btn-mini btn-success data-add" data-toggle="modal" data-target="#module-modal-data"><i class="fa fa-plus"></i> 新增</button>');
@@ -262,7 +255,32 @@ define(function(require, exports, module) {
                 }
             }
             h.push('</div>');
-            return h.join('');
+            this.element.find('div.breadcrumbs').append(h.join(''));
+
+            if (options.parent_id == 0 || !options.is_sorted) {
+                var setting = {
+                    limit: options.limit,
+                    totalpages: options.totalpages,
+                    pn: parseInt(options.pn, 10),
+                    routerstr: options.m_code + '/module/' + options.parent_id
+                };
+                var $pagingbar = this.element.find('#module-pagingbar');
+                if ($pagingbar.data('widgetCreated')) {
+                    $pagingbar.pagingbar('reRender', setting);
+                } else {
+                    $pagingbar.pagingbar(setting);
+                }
+            }
+
+            if ((options.parent_id != 0) && options.is_sorted) {
+                this._createModalSortElem();
+            }
+            if (options.is_select_import) {
+                this._createModalImportElem();
+            }
+            if (options.is_added) {
+                this._createModalDataElem();
+            }
         },
         _getSchemaListData: function() {
             var self = this,
@@ -379,7 +397,8 @@ define(function(require, exports, module) {
             h.push('<select>');
             _.each(data, function(item, index) {
                 if (item.schema_content) {
-                    options.schema_map[item.schema_code] = item.schema_content;
+                    options.schema_content_map[item.schema_code] = item.schema_content;
+                    options.schema_extend_map[item.schema_code] = item.schema_extend;
                     h.push('<option value="' + item.schema_code + '">' + item.schema_name + ' : ' + item.schema_code + '</option>');
                 }
             });
@@ -393,7 +412,6 @@ define(function(require, exports, module) {
                 h = [];
             h.push('<div class="breadcrumbs">');
             h.push('<div class="breadcrumbs-content" data-rel="tooltip">Module Data</div>');
-            h.push(this._createTableToolElem());
             h.push('</div>');
             h.push('<div class="col-xs-12">');
             h.push('<table class="table table-bordered" id="module-table"><thead class="thin-border-bottom">');
@@ -404,6 +422,7 @@ define(function(require, exports, module) {
             h.push('</div>');
 
             this.element.addClass('hide').empty().append(h.join('')).removeClass('hide');
+            this._createTableToolElem();
             this.element.find('div.breadcrumbs').css({
                 'width': this.element.width()
             });
@@ -416,7 +435,6 @@ define(function(require, exports, module) {
                 h = [];
             h.push('<div class="breadcrumbs">');
             h.push('<div class="breadcrumbs-content" data-rel="tooltip">Module Data</div>');
-            h.push(this._createTableToolElem());
             h.push('</div>');
             h.push('<div class="col-xs-12">');
             h.push('<table class="table table-bordered" id="module-table"><thead class="thin-border-bottom"><tr><th>id</th>');
@@ -433,16 +451,17 @@ define(function(require, exports, module) {
             h.push('<th>操作</th></tr></thead><tbody id="module-content">');
             h.push('</tbody></table>');
             h.push('<div class="cs-nomoredata">没有更多数据</div>');
+            h.push('<div id="module-pagingbar"></div>');
             h.push('</div>');
 
             this.element.addClass('hide').empty().append(h.join('')).removeClass('hide');
+            this._createTableToolElem();
             if (schema_content && (schema_content.length > options.limit_cols)) {
                 this._initCols();
             }
             this.element.find('div.breadcrumbs').css({
                 'width': this.element.width()
             });
-            this._createModalDataElem();
         },
         _createItemElem: function(item) {
             var self = this,
@@ -483,7 +502,7 @@ define(function(require, exports, module) {
             h.push('<td>' + item.id + '</td>');
             _.each(schema_content, function(schema_item, schema_index) {
                 if (schema_item.key === 'ukey') {
-                    h.push('<td class="uneditable" data-key="' + schema_item.key + '" data-type="' + schema_item.type + '" data-value="' + (itemdata[schema_item.key] || '') + '" title="' + (itemdata[schema_item.key] || '') + '">' + (itemdata[schema_item.key] || '') + '</td><span>')
+                    h.push('<td class="uneditable" data-key="' + schema_item.key + '" data-type="' + schema_item.type + '" data-value="' + (itemdata[schema_item.key] || '') + '" title="' + (itemdata[schema_item.key] || '') + '">' + (itemdata[schema_item.key] || '') + '</td>')
                 } else {
                     h.push('<td class="editable ');
                     h.push($table.find('th[data-key=' + schema_item.key + ']').hasClass('hide') ? 'hide' : '');
@@ -612,7 +631,8 @@ define(function(require, exports, module) {
         _schemaSave: function(event) {
             var options = this.options;
             options.schema_code = this.element.find('#data-schema').find('select').val();
-            options.schema_content = $.parseJSON(options.schema_map[options.schema_code]);
+            options.schema_content = $.parseJSON(options.schema_content_map[options.schema_code]);
+            options.schema_extend = $.parseJSON(options.schema_extend_map[options.schema_code]);
             this._createBlankElem();
             return false;
         },
