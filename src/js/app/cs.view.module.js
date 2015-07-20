@@ -67,24 +67,13 @@ define(function(require, exports, module) {
                             options.totalpages = Math.ceil(options.total / options.limit);
                             options.sortlist = data.data;
                             self._createModuleElem(data.data);
-                            var setting = {
-                                limit: options.limit,
-                                totalpages: options.totalpages,
-                                pn: parseInt(options.pn, 10),
-                                routerstr: options.m_code + '/module/' + options.parent_id
-                            };
-                            var $pagingbar = self.element.find('#module-pagingbar');
-                            if ($pagingbar.data('widgetCreated')) {
-                                $pagingbar.pagingbar('reRender', setting);
-                            } else {
-                                $pagingbar.pagingbar(setting);
-                            }
                         }
                     } else {
                         self._createModuleDataBlankElem();
                     }
                 } else {
                     notify({
+                        tmpl: 'error',
                         text: response.error
                     });
                 }
@@ -203,7 +192,7 @@ define(function(require, exports, module) {
                     h.push('<li class="active">Data Depth : ' + path[path.length - 1].depth + '</li>');
                 }
                 h.push('</ul></div>');
-                h.push(this._createTableToolElem());
+                // h.push(this._createTableToolElem());
                 h.push('</div>');
                 h.push('<div class="col-xs-12">');
                 //only show schema add on page
@@ -219,7 +208,6 @@ define(function(require, exports, module) {
             this.element.find('div.breadcrumbs').css({
                 'width': this.element.width()
             });
-
             if (options.parent_id != 0) {
                 this._createModalSortElem();
             }
@@ -239,6 +227,19 @@ define(function(require, exports, module) {
                 }
                 if (options.is_sorted) {
                     h.push('<button class="btn btn-mini btn-info data-sort" data-toggle="modal" data-target="#module-modal-sort">排序</button>');
+                } else {
+                    var setting = {
+                        limit: options.limit,
+                        totalpages: options.totalpages,
+                        pn: parseInt(options.pn, 10),
+                        routerstr: options.m_code + '/module/' + options.parent_id
+                    };
+                    var $pagingbar = self.element.find('#module-pagingbar');
+                    if ($pagingbar.data('widgetCreated')) {
+                        $pagingbar.pagingbar('reRender', setting);
+                    } else {
+                        $pagingbar.pagingbar(setting);
+                    }
                 }
                 if (options.is_added) {
                     h.push('<button class="btn btn-mini btn-success data-add" data-toggle="modal" data-target="#module-modal-data"><i class="fa fa-plus"></i> 新增</button>');
@@ -276,6 +277,7 @@ define(function(require, exports, module) {
                     self.element.find('#data-schema').append(self._createSchemaSelectElem(data.data.list));
                 } else {
                     notify({
+                        tmpl: 'error',
                         text: response.error
                     });
                 }
@@ -364,8 +366,8 @@ define(function(require, exports, module) {
             h.push('<div id="module-modal-import-content"></div>');
             h.push('</div>');
             h.push('<div class="modal-footer">');
-            h.push('<button type="button" class="btn btn-mini btn-default import-cancel" data-dismiss="modal">取消</button>');
-            h.push('<button type="button" class="btn btn-mini btn-primary import-save">保存</button>');
+            h.push('<button type="button" class="btn btn-mini btn-default import-cancel" data-dismiss="modal" id="import-cancel">取消</button>');
+            h.push('<button type="button" class="btn btn-mini btn-primary import-save" id="import-save">保存</button>');
             h.push('</div>');
             h.push('</div></div></div>');
             //-- import modal ends
@@ -481,11 +483,11 @@ define(function(require, exports, module) {
             h.push('<td>' + item.id + '</td>');
             _.each(schema_content, function(schema_item, schema_index) {
                 if (schema_item.key === 'ukey') {
-                    h.push('<td class="uneditable" data-key="' + schema_item.key + '" data-type="' + schema_item.type + '" data-value="' + (itemdata[schema_item.key] || '') + '">' + (itemdata[schema_item.key] || '') + '</td>')
+                    h.push('<td class="uneditable" data-key="' + schema_item.key + '" data-type="' + schema_item.type + '" data-value="' + (itemdata[schema_item.key] || '') + '" title="' + (itemdata[schema_item.key] || '') + '">' + (itemdata[schema_item.key] || '') + '</td><span>')
                 } else {
                     h.push('<td class="editable ');
                     h.push($table.find('th[data-key=' + schema_item.key + ']').hasClass('hide') ? 'hide' : '');
-                    h.push('" data-key="' + schema_item.key + '" data-type="' + schema_item.type + '" data-value="' + (itemdata[schema_item.key] || '') + '">');
+                    h.push('" data-key="' + schema_item.key + '" data-type="' + schema_item.type + '" data-value="' + (itemdata[schema_item.key] || '') + '" title="' + (itemdata[schema_item.key] || '') + '"><span>');
                     switch (schema_item.type) {
                         case 'select':
                             h.push('' + options['select_' + schema_item.key][itemdata[schema_item.key]] + '');
@@ -511,7 +513,7 @@ define(function(require, exports, module) {
                         default:
                             h.push(itemdata[schema_item.key] || '');
                     }
-                    h.push('</td>');
+                    h.push('</span></td>');
                 }
             });
             h.push('<td>' + schema_code + '</td><td><div class="module-status module-status-' + item.status + '">' + self.getStatusFace(item.status) + '</div></td>');
@@ -555,6 +557,7 @@ define(function(require, exports, module) {
                 'click a.data-publish': this._dataPublish,
                 'click a.data-del': this._dataDel,
                 'click a.data-edit': this._dataEditElem,
+                'click button.import-save': this._importSave,
                 'click button.sort-save': this._sortSave,
                 'click button.data-save': this._dataSave,
                 'click button.data-confirm': this._dataConfirm,
@@ -564,7 +567,9 @@ define(function(require, exports, module) {
                 'change input[type=file]': this._uploadImage,
                 'change textarea.upload-img-tx': this._previewImg,
                 'click a.schema-save': this._schemaSave,
-                'click ul.btn-cols-list>li': this._colsShow
+                'click ul.btn-cols-list>li': this._colsShow,
+                'change input.module-modal-import-item': this._toggleImportItem,
+                // 'click tbody.module-modal-import-tbody tr': this._toggleImportItem
             });
         },
         _dataAudit: function() {
@@ -597,6 +602,7 @@ define(function(require, exports, module) {
                     });
                 } else {
                     notify({
+                        tmpl: 'error',
                         text: '提交失败'
                     });
                 }
@@ -615,6 +621,7 @@ define(function(require, exports, module) {
                 options = this.options,
                 schema_content = options.schema_content,
                 schema_code = options.schema_code,
+                limit = options.limit_cols,
                 h = [],
                 $err = this.element.find('#module-modal-import-error'),
                 $loading = this.element.find('#module-modal-import-loading'),
@@ -625,44 +632,95 @@ define(function(require, exports, module) {
                 dataType: 'json'
             }).done(function(res) {
                 if (!res.errno) {
-
                     var datalist = res.data.stream_data;
                     if (!_.isEmpty(datalist)) {
+                        h.push('<table class="table table-bordered">');
+                        h.push('<thead class="thin-border-bottom"><tr>');
+                        h.push('<th>选择</th>');
+                        _.each(schema_content, function(schema_item, schema_index) {
+                            if (schema_index < limit) {
+                                h.push('<th data-key="' + schema_item.key + '">' + schema_item.desc + '</th>');
+                            }
+                        });
+                        if (schema_content.length > limit) {
+                            h.push('<th>更多省略</th>');
+                        }
+                        h.push('</tr></thead>');
+                        h.push('<tbody class="module-modal-import-tbody" id="module-modal-import-tbody">');
                         _.each(datalist, function(item, index) {
                             h.push('<tr>');
-                            h.push('<td>' + item.id || '' + '</td>');
+                            h.push('<td><input type="checkbox" class="ace module-modal-import-item"></td>');
                             _.each(schema_content, function(schema_item, schema_index) {
-                                h.push('<td data-key="' + schema_item.key + '" data-type="' + schema_item.type + '" data-value="' + (item[schema_item.key] || '') + '">');
-                                switch (schema_item.type) {
-                                    case 'select':
-                                        h.push('' + options['select_' + schema_item.key][item[schema_item.key]] + '');
-                                        break;
-                                    case 'image':
-                                        if (!!item[schema_item.key]) {
-                                            h.push('<a href="' + (item[schema_item.key] || '') + '"><img class="snapshot" src="' + (item[schema_item.key][0] || '') + '" /></a>');
-                                        } else {
-                                            h.push('');
-                                        }
-                                        break;
-                                    case 'link':
-                                        h.push('<a href="' + (item[schema_item.key] || '') + '"><span>' + (item[schema_item.key] || '') + '</span></a>');
-                                        break;
-                                    case 'boolean':
-                                        if (item[schema_item.key] == '1') {
-                                            h.push('YES');
-                                        } else {
-                                            h.push('NO');
-                                        }
-                                        break;
-                                    case 'time':
-                                    default:
-                                        h.push(item[schema_item.key] || '');
+                                if (schema_index < limit) {
+                                    h.push('<td data-key="' + schema_item.key + '" data-type="' + schema_item.type + '" data-value="' + (item[schema_item.key] || '') + '" title = "' + (item[schema_item.key] || '') + '"><span>');
+                                    switch (schema_item.type) {
+                                        case 'select':
+                                            h.push('' + options['select_' + schema_item.key][item[schema_item.key]] + '');
+                                            break;
+                                        case 'image':
+                                            if (!!item[schema_item.key] && !_.isEmpty(item[schema_item.key])) {
+                                                h.push('<img class="snapshot" src="' + (item[schema_item.key] || '') + '" />');
+                                            } else {
+                                                h.push('');
+                                            }
+                                            break;
+                                        case 'link':
+                                            h.push('<a href="' + (item[schema_item.key] || '') + '"><span>' + (item[schema_item.key] || '') + '</span></a>');
+                                            break;
+                                        case 'boolean':
+                                            if (item[schema_item.key] == '1') {
+                                                h.push('YES');
+                                            } else {
+                                                h.push('NO');
+                                            }
+                                            break;
+                                        case 'time':
+                                        default:
+                                            h.push(item[schema_item.key] || '');
+                                    }
+                                    h.push('</span></td>');
+                                } else {
+                                    h.push('<td class="hide" data-key="' + schema_item.key + '" data-type="' + schema_item.type + '" data-value="' + (item[schema_item.key] || '') + '">');
+                                    switch (schema_item.type) {
+                                        case 'select':
+                                            h.push('' + options['select_' + schema_item.key][item[schema_item.key]] + '');
+                                            break;
+                                        case 'image':
+                                            if (!!item[schema_item.key] && !_.isEmpty(item[schema_item.key])) {
+                                                h.push('<img class="snapshot" src="' + (item[schema_item.key] || '') + '" />');
+                                            } else {
+                                                h.push('');
+                                            }
+                                            break;
+                                        case 'link':
+                                            h.push('<a href="' + (item[schema_item.key] || '') + '"><span>' + (item[schema_item.key] || '') + '</span></a>');
+                                            break;
+                                        case 'boolean':
+                                            if (item[schema_item.key] == '1') {
+                                                h.push('YES');
+                                            } else {
+                                                h.push('NO');
+                                            }
+                                            break;
+                                        case 'time':
+                                        default:
+                                            h.push(item[schema_item.key] || '');
+                                    }
+                                    h.push('</td>');
                                 }
-                                h.push('</td>');
                             });
+                            if (schema_content.length > limit) {
+                                h.push('<td>...</td>');
+                            }
                             h.push('</tr>');
                         });
+                        h.push('</tbody>');
+                        h.push('</table>');
                         $content.addClass('hide').empty().append(h.join('')).removeClass('hide');
+                        $content.find('td[data-key]').css({
+                            'width': (90 / (Math.min(schema_content.length, limit) + 1)) + '%'
+                        });
+
                     } else {
                         $err.html('没有数据。').removeClass('hide');
                     }
@@ -740,7 +798,7 @@ define(function(require, exports, module) {
             $list.empty().append(h.join(''));
             $content.find('span[data-key]').css({
                 'width': (90 / (Math.min(schema_content.length, limit) + 1)) + '%'
-            })
+            });
         },
         _dataAddElem: function() {
             var self = this,
@@ -774,9 +832,12 @@ define(function(require, exports, module) {
                                 break;
                             case 'time':
                             case 'link':
-                            case 'text':
                             default:
                                 h.push(schema_item.default);
+                                break;
+                            case 'text':
+
+                                break;
                         }
                     }
                 } else {
@@ -968,6 +1029,14 @@ define(function(require, exports, module) {
             var $tr = $(event.target).closest('tr'),
                 id = $tr.attr('data-id'),
                 options = this.options;
+            if (options.total == 1) {
+                notify({
+                    tmpl: 'error',
+                    text: '请保留最后一条数据。'
+                });
+                return false;
+            }
+
             if (!!id) {
                 //delete existing item
                 $.ajax({
@@ -982,16 +1051,19 @@ define(function(require, exports, module) {
                         options.sortlist = _.reject(options.sortlist, function(item) {
                             return item.id == id;
                         });
+                        options.total = options.total - 1;
                         notify({
                             text: '删除成功。'
                         });
                     } else {
                         notify({
+                            tmpl: 'error',
                             text: '删除失败，请稍后再试。'
                         });
                     }
                 }).fail(function() {
                     notify({
+                        tmpl: 'error',
                         text: '删除失败，请稍后再试。'
                     });
                 });
@@ -1000,6 +1072,44 @@ define(function(require, exports, module) {
                 $tr.remove();
             }
             return false;
+        },
+        _importSave: function(event) {
+            var self = this,
+                options = this.options,
+                $selected = this.element.find('#module-modal-import-tbody').children('tr.selected'),
+                $cancel = this.element.find('#import-cancel');
+            //return if no selected rows
+            if (!$selected.length) {
+                $cancel.trigger('click');
+                return false;
+            }
+
+            //save one by one
+            $selected.each(function() {
+                var item = {};
+                $(this).find('td[data-key]').each(function() {
+                    var type = $(this).attr('data-type'),
+                        key = $(this).attr('data-key'),
+                        value = $(this).attr('data-value');
+                    //['text', 'link', 'boolean', 'image', 'select', 'time'],
+                    if (type == 'boolean') {
+                        value = value || '0'
+                    } else {
+                        value = value || ''
+                    }
+                    item[key] = value;
+                });
+
+                var reqdata = {
+                    m_code: options.m_code,
+                    data: JSON.stringify(item),
+                    parent_id: options.parent_id,
+                    schema_code: options.schema_code
+                };
+                self._updateDataReq(options.dataadd, reqdata);
+            });
+
+            $cancel.trigger('click');
         },
         _sortSave: function(event) {
             var self = this,
@@ -1025,11 +1135,13 @@ define(function(require, exports, module) {
                     self.reRender();
                 } else {
                     notify({
+                        tmpl: 'error',
                         text: res.error
                     });
                 }
             }).fail(function() {
                 notify({
+                    tmpl: 'error',
                     text: '保存失败，请稍后再试。'
                 });
             });
@@ -1165,16 +1277,19 @@ define(function(require, exports, module) {
                                 $content.append(self._createItemElem(item));
                             }
                             options.sortlist.push(item);
+                            options.total = options.total + 1;
                         }
                         self.element.find('button.data-cancel').trigger('click');
                     }
                 } else {
                     notify({
+                        tmpl: 'error',
                         text: response.error
                     });
                 }
             }).fail(function() {
                 notify({
+                    tmpl: 'error',
                     text: '保存失败，请稍后再试。'
                 });
             });
@@ -1281,6 +1396,15 @@ define(function(require, exports, module) {
             var $table = this.element.find('#module-table');
             $table.find('th[data-key=' + key + ']').removeClass('hide');
             $table.find('td[data-key=' + key + ']').removeClass('hide');
+        },
+        _toggleImportItem: function(event) {
+            var $tr = $(event.target).closest('tr'),
+                is_selected = $(event.target).is(':checked');
+            if (is_selected) {
+                $tr.addClass('selected');
+            } else {
+                $tr.removeClass('selected');
+            }
         }
     });
     module.exports = $.cs.module;

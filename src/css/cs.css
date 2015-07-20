@@ -2,11 +2,26 @@ body {
     font-family: 微软雅黑, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-td {
-    height: 1px;
+td,
+td > span {
     word-break: break-all;
     max-width: 300px;
     font-size: 13px !important;
+    cursor: default;
+}
+
+td > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-height: 16px;
+    max-height: 48px;
+}
+
+td:first-child {
+    width: 4%;
 }
 
 td[colspan] {
@@ -16,6 +31,8 @@ td[colspan] {
 a {
     cursor: pointer;
 }
+
+
 /*nav*/
 
 .sidebar {
@@ -91,7 +108,6 @@ textarea {
     margin: 0;
     padding: 0;
     /*border: 0;*/
-    
     -webkit-appearance: none !important;
     outline: 0 !important;
     background: transparent;
@@ -109,6 +125,8 @@ textarea {
 .table-tool {
     float: right;
 }
+
+
 /* plugin notify*/
 
 .notify-wrapper {
@@ -283,6 +301,8 @@ input[type=text] {
 .dropdown-alert li a {
     color: #08c;
 }
+
+
 /*paging*/
 
 .paging {
@@ -329,6 +349,8 @@ input[type=text] {
     text-align: center;
     margin-bottom: 20px;
 }
+
+
 /*loading*/
 
 .cs-loading {
@@ -347,6 +369,8 @@ input[type=text] {
     display: inline-block;
     -webkit-animation: loading 800ms linear infinite;
 }
+
+
 /*modal*/
 
 .modal-backdrop {
@@ -402,6 +426,8 @@ input[type=text] {
 .col-xs-12 {
     margin-top: 50px;
 }
+
+
 /*sort*/
 
 .large-modal-dialog {
@@ -428,4 +454,18 @@ input[type=text] {
 
 span.sortable-more {
     width: 6%;
+}
+
+input[type=checkbox].ace,
+input[type=radio].ace {
+    opacity: 1;
+}
+
+.module-modal-import-tbody td:first-child {
+    width: 6%;
+}
+
+.module-modal-import-tbody>tr.selected {
+    color: #8090A0;
+    background-color: #F4F9FC;
 }
