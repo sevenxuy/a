@@ -28,6 +28,7 @@ define(function(require, exports, module) {
             schema_extend_map: {},
             limit: 60,
             limit_cols: 5,
+            sum_limit: 0,
             is_sorted: false,
             is_added: true,
             is_select_import: false,
@@ -73,6 +74,7 @@ define(function(require, exports, module) {
                             options.is_added = true;
                             options.is_select_import = false;
                             options.is_preview = false;
+                            options.sum_limit = 0;
                             self._createModuleElem(data.data);
                         }
                     } else {
@@ -1124,6 +1126,14 @@ define(function(require, exports, module) {
                 return false;
             }
 
+            if (options.sum_limit < options.total + $selected.length) {
+                notify({
+                    tmpl: 'error',
+                    text: 'Schema:' + options.schema_code + '的条目限数为：' + options.sum_limit + '；当前页面已有' + options.total + '条数据，最多能导入' + (options.sum_limit - options.total) + '条数据。'
+                });
+                return false;
+            }
+
             //save one by one
             $selected.each(function() {
                 var item = {};
@@ -1139,15 +1149,7 @@ define(function(require, exports, module) {
                     }
                     item[key] = value;
                 });
-
                 data.push(item)
-                    // var reqdata = {
-                    //     m_code: options.m_code,
-                    //     data: JSON.stringify(item),
-                    //     parent_id: options.parent_id,
-                    //     schema_code: options.schema_code
-                    // };
-                    // self._updateDataReq(options.dataadd, reqdata);
             });
             var reqdata = {
                 m_code: options.m_code,
@@ -1352,7 +1354,12 @@ define(function(require, exports, module) {
                 data: reqdata
             }).done(function(res) {
                 if (!res.errno) {
-                    console.log(res);
+                    var datalist = res.data.data;
+                    _.each(datalist, function(item, index) {
+                        $content.append(self._createItemElem(item));
+                        options.sortlist.push(item);
+                        options.total = options.total + 1;
+                    });
                 } else {
                     notify({
                         tmpl: 'error',

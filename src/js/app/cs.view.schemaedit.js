@@ -258,14 +258,15 @@ define(function(require, exports, module) {
                 })['value'] + '</textarea></td></tr>');
                 //TODO h.push('<tr><td>valid_check</td><td>有效性检查</td><td><textarea></textarea></td></tr>');
                 h.push('<tr><td>sum_limit</td><td>条目限数</td><td>');
-                h.push('<div class="table_tip">提示：<br>1.sum_limit值必须为不大于60的正整数，且仅当is_sorted值为NO时有效。<br/>2.若is_sorted值为YES，此处必须留空。</div><div class="table_err hide"></div>');
-                h.push('<input id="plugin-list-sum_limit" type="text" value="' + (_.findWhere(list, {
-                    key: 'is_sorted'
-                })['value'] == 1 ? '' : (_.findWhere(list, {
-                    key: 'sum_limit'
-                })['value'])) + '" ' + (_.findWhere(list, {
-                    key: 'is_sorted'
-                })['value'] == 1 ? 'readonly="readonly"' : '') + '/></td></tr>');
+                h.push('<div class="table_tip">提示：<br>1.若is_sorted值为NO，sum_limit值必须为不大于60的正整数。<br/>2.若is_sorted值为YES，此处必须留空。</div><div class="table_err hide"></div>');
+                h.push('<input id="plugin-list-sum_limit" type="text" value="' +
+                    (_.findWhere(list, {
+                        key: 'is_sorted'
+                    })['value'] == 1 ? (_.findWhere(list, {
+                        key: 'sum_limit'
+                    })['value'] || '60') : '') + (_.findWhere(list, {
+                        key: 'is_sorted'
+                    })['value'] == 1 ? '' : ' readonly="readonly"') + '"/></td></tr>');
                 h.push('<tr><td colspan="3" class="table-header-item">For Item</td></tr>');
                 h.push('<tr><td>preview</td><td>预览</td><td><div class="table_err hide"></div><textarea id="plugin-item-preview">' + _.findWhere(item, {
                     key: 'preview'
@@ -277,8 +278,8 @@ define(function(require, exports, module) {
                 h.push('<tr><td>select_import</td><td>选择添加</td><td><div class="table_err hide"></div><textarea id="plugin-list-select_import"></textarea></td></tr>');
                 //TODO h.push('<tr><td>valid_check</td><td>有效性检查</td><td><textarea></textarea></td></tr>');
                 h.push('<tr><td>sum_limit</td><td>条目限数</td><td>');
-                h.push('<div class="table_tip">提示：<br>1.sum_limit值必须为不大于60的正整数，且仅当is_sorted值为NO时有效。<br/>2.若is_sorted值为YES，此处必须留空。</div><div class="table_err hide"></div>');
-                h.push('<input id="plugin-list-sum_limit" type="text" value="' + options.sum_limit + '"/></td></tr>');
+                h.push('<div class="table_tip">提示：<br>1.若is_sorted值为NO，sum_limit值必须为不大于60的正整数。<br/>2.若is_sorted值为YES，此处必须留空。</div><div class="table_err hide"></div>');
+                h.push('<input id="plugin-list-sum_limit" type="text" value="" readonly="readonly"/></td></tr>');
                 h.push('<tr><td colspan="3" class="table-header-item">For Item</td></tr>');
                 h.push('<tr><td>preview</td><td>预览</td><td><div class="table_err hide"></div><textarea id="plugin-item-preview"></textarea></td></tr>');
             }
@@ -307,9 +308,9 @@ define(function(require, exports, module) {
             //TODO h.push('<tr><td>valid_check</td><td>有效性检查</td><td><textarea></textarea></td></tr>');
             h.push('<tr><td>sum_limit</td><td>条目限数</td><td>' + (_.findWhere(list, {
                 key: 'is_sorted'
-            }).value == 1 ? '' : (_.findWhere(list, {
+            }).value == 1 ? (_.findWhere(list, {
                 key: 'sum_limit'
-            }).value) || '') + '</td></tr>');
+            }).value) : '' || '') + '</td></tr>');
             h.push('<tr><td colspan="3" class="table-header-item">For Item</td></tr>');
             h.push('<tr><td>preview</td><td>预览</td><td>' + _.findWhere(item, {
                 key: 'preview'
@@ -730,7 +731,6 @@ define(function(require, exports, module) {
                     value: preview
                 }]
             }
-
             options.schema_extend.plugin = plugin;
 
             this.element.find('#schema-plugin').empty().append(this._createSchemaPluginElem(plugin));
@@ -828,16 +828,15 @@ define(function(require, exports, module) {
             var is_sorted = $(event.target).is(':checked'),
                 $sum_limit = this.element.find('#plugin-list-sum_limit');
             if (is_sorted) {
+                $sum_limit.removeAttr('readonly');
+                $sum_limit.val('60');
+            } else {
                 $sum_limit.attr({
                     'readonly': 'readonly',
                 });
                 $sum_limit.val('');
-            } else {
-                $sum_limit.removeAttr('readonly');
-                $sum_limit.val('60');
             }
         }
-
     });
     module.exports = $.cs.schemaedit;
 });
