@@ -23,14 +23,15 @@ define(function(require, exports, module) {
             ukeyexist: '/ucms/cms/ukeyexist',
             smapupdate: '/ucms/cms/smapupdate',
             schema_content: [],
+            schema_extend: {},
             schema_content_map: {},
             schema_extend_map: {},
             limit: 60,
             limit_cols: 5,
             is_sorted: false,
-            // sum_limit: 60,
             is_added: true,
-            is_select_import: false
+            is_select_import: false,
+            is_preview: false
         },
         _create: function() {
             this.render();
@@ -67,6 +68,11 @@ define(function(require, exports, module) {
                             options.total = data.total;
                             options.totalpages = Math.ceil(options.total / options.limit);
                             options.sortlist = data.data;
+                            //reset settings
+                            options.is_sorted = false;
+                            options.is_added = true;
+                            options.is_select_import = false;
+                            options.is_preview = false;
                             self._createModuleElem(data.data);
                         }
                     } else {
@@ -216,7 +222,15 @@ define(function(require, exports, module) {
                         })['value'];
                     }
                 }
-                if (options.schema_extend.plugin.item) {}
+                if (options.schema_extend.plugin.item) {
+                    var preview_ = _.findWhere(options.schema_extend.plugin.item, {
+                        key: 'preview'
+                    })['value'];
+                    if (preview_.length) {
+                        options.is_preview = true;
+                        options.preview = preview_;
+                    }
+                }
             }
         },
         _createTableToolElem: function() {
@@ -499,6 +513,7 @@ define(function(require, exports, module) {
                 h = [],
                 itemdata = $.parseJSON(item.data),
                 $table = this.element.find('#module-table');
+            this._initSettings();
             h.push('<td>' + item.id + '</td>');
             _.each(schema_content, function(schema_item, schema_index) {
                 if (schema_item.key === 'ukey') {
@@ -540,6 +555,9 @@ define(function(require, exports, module) {
                 h.push('<td>' + item.update_time + '</td>');
             }
             h.push('<td>');
+            if (options.is_preview) {
+                h.push('<a class="btn btn-link data-preview" data-link="' + (itemdata['link'] || '') + '">预览</a>');
+            }
             h.push('<a class="btn btn-link data-edit" data-toggle="modal" data-target="#module-modal-data">编辑</a>');
             h.push('<a class="btn btn-link data-save hide">保存</a>');
             h.push('<a class="btn btn-link data-expand">展开</a>');
@@ -576,6 +594,7 @@ define(function(require, exports, module) {
                 'click a.data-publish': this._dataPublish,
                 'click a.data-del': this._dataDel,
                 'click a.data-edit': this._dataEditElem,
+                'click a.data-preview': this._dataPreview,
                 'click button.import-save': this._importSave,
                 'click button.sort-save': this._sortSave,
                 'click button.data-save': this._dataSave,
@@ -1097,7 +1116,8 @@ define(function(require, exports, module) {
             var self = this,
                 options = this.options,
                 $selected = this.element.find('#module-modal-import-tbody').children('tr.selected'),
-                $cancel = this.element.find('#import-cancel');
+                $cancel = this.element.find('#import-cancel'),
+                data = [];
             //return if no selected rows
             if (!$selected.length) {
                 $cancel.trigger('click');
@@ -1120,15 +1140,23 @@ define(function(require, exports, module) {
                     item[key] = value;
                 });
 
-                var reqdata = {
-                    m_code: options.m_code,
-                    data: JSON.stringify(item),
-                    parent_id: options.parent_id,
-                    schema_code: options.schema_code
-                };
-                self._updateDataReq(options.dataadd, reqdata);
+                data.push(item)
+                    // var reqdata = {
+                    //     m_code: options.m_code,
+                    //     data: JSON.stringify(item),
+                    //     parent_id: options.parent_id,
+                    //     schema_code: options.schema_code
+                    // };
+                    // self._updateDataReq(options.dataadd, reqdata);
             });
-
+            var reqdata = {
+                m_code: options.m_code,
+                data: JSON.stringify(data),
+                parent_id: options.parent_id,
+                schema_code: options.schema_code,
+                mutadd: 1
+            };
+            self._updateMultipleDataReq(options.dataadd, reqdata);
             $cancel.trigger('click');
         },
         _sortSave: function(event) {
@@ -1314,6 +1342,30 @@ define(function(require, exports, module) {
                 });
             });
         },
+        _updateMultipleDataReq: function(requrl, reqdata) {
+            var self = this,
+                options = this.options,
+                $content = this.element.find('#module-content');
+            $.ajax({
+                url: requrl,
+                method: 'POST',
+                data: reqdata
+            }).done(function(res) {
+                if (!res.errno) {
+                    console.log(res);
+                } else {
+                    notify({
+                        tmpl: 'error',
+                        text: res.error
+                    });
+                }
+            }).fail(function() {
+                notify({
+                    tmpl: 'error',
+                    text: '保存失败，请稍后再试。'
+                });
+            });
+        },
         _dataExpand: function(event) {
             var options = this.options,
                 parent_id = $(event.target).closest('tr').attr('data-id'),
@@ -1425,6 +1477,11 @@ define(function(require, exports, module) {
             } else {
                 $tr.removeClass('selected');
             }
+        },
+        _dataPreview: function(event) {
+            var options = this.options,
+                link = $(event.target).attr('data-link');
+            window.open(options.preview + link, '_blank', 'toolbar=0,location=0,menubar=0,width=600, height=800');
         }
     });
     module.exports = $.cs.module;
