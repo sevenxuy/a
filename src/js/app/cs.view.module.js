@@ -979,29 +979,28 @@ define(function(require, exports, module) {
                     h.push('<td class="uneditable" data-key="' + schema_item.key + '" data-type="' + schema_item.type + '" data-value="' + data[schema_item.key] + '">' + data[schema_item.key] + '</td>');
                 } else {
                     if (schema_item.editable == 0) {
-                        h.push('<td class="uneditable" data-key="' + schema_item.key + '" data-type="' + schema_item.type + '" data-value="' + (schema_item.default || '') + '">');
-                        if (!!schema_item.default) {
-                            switch (schema_item.type) {
-                                case 'select':
-                                    h.push(schema_item.default);
-                                    break;
-                                case 'image':
-                                    h.push('<div class="upload-img-preivew"><img src="' + schema_item.default+'"></div>');
-                                    break;
-                                case 'boolean':
-                                    if (schema_item.default == 1) {
-                                        h.push('YES');
-                                    } else {
-                                        h.push('NO');
-                                    }
-                                    break;
-                                case 'time':
-                                case 'link':
-                                case 'text':
-                                default:
-                                    h.push(schema_item.default);
-                            }
+                        h.push('<td class="uneditable" data-key="' + schema_item.key + '" data-type="' + schema_item.type + '" data-value="' + (data[schema_item.key] || schema_item.default) + '">');
+                        switch (schema_item.type) {
+                            case 'select':
+                                h.push(data[schema_item.key] || schema_item.default);
+                                break;
+                            case 'image':
+                                h.push('<div class="upload-img-preivew"><img src="' + (data[schema_item.key] || schema_item.default) + '"></div>');
+                                break;
+                            case 'boolean':
+                                if (data[schema_item.key] == 1) {
+                                    h.push('YES');
+                                } else {
+                                    h.push('NO');
+                                }
+                                break;
+                            case 'time':
+                            case 'link':
+                            case 'text':
+                            default:
+                                h.push('' + data[schema_item.key] || schema_item.default);
                         }
+                        h.push('</td>');
                     } else {
                         h.push('<td class="editable" data-key="' + schema_item.key + '" data-type="' + schema_item.type + '">');
                         switch (schema_item.type) {
@@ -1038,8 +1037,8 @@ define(function(require, exports, module) {
                             case 'text':
                                 h.push('<textarea style="background: #fff">' + (data[schema_item.key] || '') + '</textarea>');
                         }
+                        h.push('</td>');
                     }
-                    h.push('</td>');
                 }
                 h.push('</tr>');
             });
