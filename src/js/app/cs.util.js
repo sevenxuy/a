@@ -45,6 +45,11 @@ define(function(require, exports, module) {
         return h.join('');
     };
     exports.validateId = function(str) {
+        var result = str.match(/\w+$/);
+        if (result == null) return false;
+        return true;
+    };
+    exports.validateUkey = function(str) {
         var result = str.match(/^[a-zA-Z]\w+$/);
         if (result == null) return false;
         return true;

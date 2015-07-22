@@ -1239,7 +1239,7 @@ define(function(require, exports, module) {
             self.element.find('#module-modal-data').find('button.data-cancel').trigger('click');
 
             if ((options.parent_id == 0) && (!id)) {
-                if (data['ukey'] && _util.validateId(data['ukey'])) {
+                if (data['ukey'] && _util.validateUkey(data['ukey'])) {
                     $.ajax({
                         url: options.ukeyexist,
                         data: {
