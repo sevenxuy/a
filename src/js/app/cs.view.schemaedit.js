@@ -37,7 +37,7 @@ define(function(require, exports, module) {
                         use_acl = data.use_acl;
                     if (use_acl && (!_.isEmpty(use_acl))) {
                         options.role = use_acl.role;
-                        if (use_acl.module_acl && (use_acl.module_acl != 'null') && (use_acl.module_acl != '{}')) {
+                        if (use_acl.module_acl && use_acl.module_acl.length && (use_acl.module_acl != 'null') && (use_acl.module_acl != '{}')) {
                             options.role_current = $.parseJSON(use_acl.module_acl)[options.m_code];
                         }
                         if (((options.role == '1') && (options.role_current == '3')) || (options.role == '5') || (options.role == '9')) {
@@ -88,7 +88,7 @@ define(function(require, exports, module) {
             h.push('<div class="schema-table">');
             h.push('<div class="table-header">Schema Content</div>');
             h.push('<table class="table table-bordered table-hover"><thead><tr>');
-            h.push('<th>key</th><th>desc</th><th>type</th><th>regx</th><th>is_index</th>');
+            h.push('<th>key</th><th>desc</th><th>type</th><th>regx</th><th>default</th><th>editable</th><th>is_index</th>');
             h.push('</tr></thead><tbody id="schemaedit-content">');
             if (data.schema_content) {
                 options.schema_content_origin = data.schema_content;
@@ -130,9 +130,6 @@ define(function(require, exports, module) {
             h.push('</div>');
             h.push('</div>');
             this.element.addClass('hide').empty().append(h.join('')).removeClass('hide');
-            this.element.find('div.breadcrumbs').css({
-                'width': this.element.width()
-            });
         },
         _createSchemaEditElem: function(data) {
             var self = this,
@@ -205,9 +202,6 @@ define(function(require, exports, module) {
             h.push(this._createContentModalElem());
             h.push(this._createPluginModalElem());
             this.element.addClass('hide').empty().append(h.join('')).removeClass('hide');
-            this.element.find('div.breadcrumbs').css({
-                'width': this.element.width()
-            });
         },
         _createContentModalElem: function() {
             var h = [];

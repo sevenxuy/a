@@ -57,7 +57,7 @@ define(function(require, exports, module) {
                         var use_acl = data.use_acl;
                         if (use_acl && (!_.isEmpty(use_acl))) {
                             options.role = use_acl.role;
-                            if (use_acl.module_acl && (use_acl.module_acl != 'null') && (use_acl.module_acl != '{}')) {
+                            if (use_acl.module_acl && use_acl.module_acl.length && (use_acl.module_acl != 'null') && (use_acl.module_acl != '{}')) {
                                 options.role_current = $.parseJSON(use_acl.module_acl)[options.m_code];
                             }
                             options.schema_content = $.parseJSON(data.schema_content);
@@ -152,9 +152,6 @@ define(function(require, exports, module) {
                 if (schema_content && (schema_content.length > options.limit_cols)) {
                     this._initCols();
                 }
-                this.element.find('div.breadcrumbs').css({
-                    'width': this.element.width()
-                });
             } else {
                 h.push('<div class="breadcrumbs">');
                 h.push('<div class="breadcrumbs-content" data-rel="tooltip"><ul class="breadcrumb">');
@@ -175,9 +172,6 @@ define(function(require, exports, module) {
                 self._getSchemaListData();
                 h.push('</div>');
                 this.element.empty().append(h.join(''));
-                this.element.find('div.breadcrumbs').css({
-                    'width': this.element.width()
-                });
             }
         },
         _createUkeyModalElem: function() {
@@ -308,7 +302,7 @@ define(function(require, exports, module) {
                 }
             }).done(function(data) {
                 if (!data.errno) {
-                    self.element.find('#data-schema').append(self._createSchemaSelectElem(data.data.list));
+                    self.element.find('#data-schema').empty().append(self._createSchemaSelectElem(data.data.list));
                 } else {
                     notify({
                         tmpl: 'error',
@@ -411,10 +405,12 @@ define(function(require, exports, module) {
             var options = this.options,
                 h = [];
             h.push('<select>');
+            options.schema_content_map = {};
+            options.schema_extend_map = {};
             _.each(data, function(item, index) {
                 if (item.schema_content) {
-                    options.schema_content_map[item.schema_code] = item.schema_content;
-                    options.schema_extend_map[item.schema_code] = item.schema_extend;
+                    options.schema_content_map[item.schema_code] = item.schema_content || '[]'
+                    options.schema_extend_map[item.schema_code] = item.schema_extend || '{}';
                     h.push('<option value="' + item.schema_code + '">' + item.schema_name + ' : ' + item.schema_code + '</option>');
                 }
             });
@@ -439,9 +435,6 @@ define(function(require, exports, module) {
 
             this.element.addClass('hide').empty().append(h.join('')).removeClass('hide');
             this._createTableToolElem();
-            this.element.find('div.breadcrumbs').css({
-                'width': this.element.width()
-            });
             this._createModalDataElem();
         },
         _createBlankElem: function() {
@@ -475,9 +468,6 @@ define(function(require, exports, module) {
             if (schema_content && (schema_content.length > options.limit_cols)) {
                 this._initCols();
             }
-            this.element.find('div.breadcrumbs').css({
-                'width': this.element.width()
-            });
         },
         _createItemElem: function(item) {
             var self = this,

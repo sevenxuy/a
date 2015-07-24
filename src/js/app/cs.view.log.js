@@ -37,9 +37,6 @@ define(function(require, exports, module) {
             h.push('</div>');
             this.element.append(h.join(''));
             this.renderTable();
-            this.element.find('div.breadcrumbs').css({
-                'width': this.element.width()
-            });
         },
         renderTable: function() {
             var self = this,

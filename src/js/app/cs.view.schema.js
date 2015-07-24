@@ -30,7 +30,7 @@ define(function(require, exports, module) {
                         use_acl = data.use_acl;
                     if (use_acl && (!_.isEmpty(use_acl))) {
                         options.role = use_acl.role;
-                        if (use_acl.module_acl && (use_acl.module_acl != 'null') && (use_acl.module_acl != '{}')) {
+                        if (use_acl.module_acl && use_acl.module_acl.length && (use_acl.module_acl != 'null') && (use_acl.module_acl != '{}')) {
                             options.role_current = $.parseJSON(use_acl.module_acl)[options.m_code];
                         }
                         self._createWrapperElem(data.list);
@@ -101,9 +101,6 @@ define(function(require, exports, module) {
             //-- data item modal ends
             this.element.append(h.join(''));
             this._createTableElem(data);
-            this.element.find('div.breadcrumbs').css({
-                'width': this.element.width()
-            });
         },
         _bindEvents: function() {
             this._on(this.element, {

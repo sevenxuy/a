@@ -70,10 +70,7 @@ a {
 .breadcrumbs {
     padding: 0 15px;
     display: -webkit-box;
-    position: fixed;
-    top: 45px;
-    z-index: 2;
-    left: 170px;
+    margin-bottom: 15px;
 }
 
 .breadcrumb {
@@ -417,10 +414,6 @@ input[type=text] {
     color: #3c763d;
     text-align: left !important;
     font-weight: bold;
-}
-
-.col-xs-12 {
-    margin-top: 50px;
 }
 
 
