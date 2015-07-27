@@ -817,7 +817,8 @@ define(function(require, exports, module) {
                                 h.push(itemdata[schema_item.key] || '');
                                 break;
                             case 'text':
-                                h.push((itemdata[schema_item.key] || '').substr(0, 16) + '...');
+                                var value = itemdata[schema_item.key] || '';
+                                h.push(value.length > 16 ? value.substr(0, 16) + '...' : value);
                                 break;
                             default:
                                 h.push(itemdata[schema_item.key] || '');
