@@ -662,8 +662,8 @@ define(function(require, exports, module) {
                 crossDomain: true,
                 dataType: 'json'
             }).done(function(res) {
-                if (!res.errno) {
-                    var datalist = res.data.stream_data;
+                if ((!res.errno) && res.result && res.result.stream_data) {
+                    var datalist = res.result.stream_data;
                     if (!_.isEmpty(datalist)) {
                         h.push('<table class="table table-bordered">');
                         h.push('<thead class="thin-border-bottom"><tr>');
