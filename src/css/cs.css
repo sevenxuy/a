@@ -435,6 +435,7 @@ input[type=text] {
     text-align: center;
     display: inline-block;
     word-break: break-all;
+    padding: 1px;
 }
 
 .item-list>li>span:first-child {

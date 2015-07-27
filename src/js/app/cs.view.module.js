@@ -791,7 +791,7 @@ define(function(require, exports, module) {
                 h.push('<span>' + item.id + '</span>');
                 _.each(schema_content, function(schema_item, schema_index) {
                     if (schema_index < limit) {
-                        h.push('<span data-key="' + schema_item.key + '">');
+                        h.push('<span data-key="' + schema_item.key + '" title="' + (itemdata[schema_item.key] || '') + '">');
                         switch (schema_item.type) {
                             case 'select':
                                 h.push('' + options['select_' + schema_item.key][itemdata[schema_item.key]] + '');
@@ -804,7 +804,7 @@ define(function(require, exports, module) {
                                 }
                                 break;
                             case 'link':
-                                h.push('<a href="' + (itemdata[schema_item.key] || '') + '"><span>' + (itemdata[schema_item.key] || '') + '</span></a>');
+                                h.push('<a href="' + (itemdata[schema_item.key] || '') + '">' + (itemdata[schema_item.key] || '') + '</a>');
                                 break;
                             case 'boolean':
                                 if (itemdata[schema_item.key] == '1') {
@@ -814,8 +814,14 @@ define(function(require, exports, module) {
                                 }
                                 break;
                             case 'time':
+                                h.push(itemdata[schema_item.key] || '');
+                                break;
+                            case 'text':
+                                h.push((itemdata[schema_item.key] || '').substr(0, 16) + '...');
+                                break;
                             default:
                                 h.push(itemdata[schema_item.key] || '');
+
                         }
                         h.push('</span>');
                     }
