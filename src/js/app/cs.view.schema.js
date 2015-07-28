@@ -9,7 +9,9 @@ define(function(require, exports, module) {
             // schemagetlist: '../../datacms/schemagetlist.json',
             schemagetlist: '/ucms/cms/schemagetlist',
             schemaadd: '/ucms/cms/schemaadd',
-            schemadel: '/ucms/cms/schemadel'
+            schemadel: '/ucms/cms/schemadel',
+            schema_list: [],
+            copyFrom: null
         },
         _create: function() {
             this.render();
@@ -33,6 +35,7 @@ define(function(require, exports, module) {
                         if (use_acl.module_acl && use_acl.module_acl.length && (use_acl.module_acl != 'null') && (use_acl.module_acl != '{}')) {
                             options.role_current = $.parseJSON(use_acl.module_acl)[options.m_code];
                         }
+                        options.schema_list = data.list;
                         self._createWrapperElem(data.list);
                     }
                 } else {
@@ -108,6 +111,7 @@ define(function(require, exports, module) {
                 'click button.data-save': this._dataSave,
                 'click a.data-edit': this._dataEdit,
                 'click a.data-view': this._dataEdit,
+                'click a.data-copyadd': this._dataCopyAddElem,
                 'click a.data-del': this._dataDel
             });
         },
@@ -123,10 +127,11 @@ define(function(require, exports, module) {
         _createSchemaItemElem: function(item) {
             var h = [],
                 options = this.options;
-            h.push('<tr data-schema_code="' + item.schema_code + '"><td>' + item.id + '</td><td>' + item.schema_name + '</td><td>' + item.schema_code + '</td>');
+            h.push('<tr data-schema_code="' + item.schema_code + '" data-schema_name = "' + item.schema_name + '" data-copy_index="0"><td>' + item.id + '</td><td>' + item.schema_name + '</td><td>' + item.schema_code + '</td>');
             if (((options.role == '1') && (options.role_current == '3')) || (options.role == '5') || (options.role == '9')) {
                 h.push('<td>');
                 h.push('<a class="btn btn-link data-edit">编辑</a>');
+                h.push('<a class="btn btn-link data-copyadd" data-toggle="modal" data-target="#schame-modal-data">复制创建</a>');
                 h.push('<div class="btn-group">');
                 h.push('<a data-toggle="dropdown" class="btn btn-link btn-white dropdown-toggle" aria-expanded="false">删除</a>');
                 h.push('<ul class="dropdown-menu dropdown-menu-right dropdown-alert">');
@@ -157,6 +162,7 @@ define(function(require, exports, module) {
             $('textarea').each(function() {
                 autosize($(this));
             });
+            this.options.copyFrom = null;
         },
         _dataSave: function(event) {
             var self = this,
@@ -164,20 +170,37 @@ define(function(require, exports, module) {
                 $content = this.element.find('#schema-modal-data-content'),
                 $error = $content.find('div.cs-error'),
                 schema_name = $content.find('textarea[data-key=schema_name]').val().trim(),
-                schema_code = $content.find('textarea[data-key=schema_code]').val().trim();
-            if ((!!schema_name) && !!(schema_code)) {
-                $.ajax({
-                    url: options.schemaadd,
-                    data: {
+                schema_code = $content.find('textarea[data-key=schema_code]').val().trim(),
+                data = {};
+            if ((!!schema_name) && (!!schema_code)) {
+
+                if (options.copyFrom) {
+                    //复制创建
+                    data = {
                         m_code: options.m_code,
                         schema_name: schema_name,
                         schema_code: schema_code,
-                        schema_content: null
+                        schema_content: options.copyFrom.schema_content,
+                        schema_extend: options.copyFrom.schema_extend
                     }
+                } else {
+                    //新增
+                    data = {
+                        m_code: options.m_code,
+                        schema_name: schema_name,
+                        schema_code: schema_code,
+                        schema_content: null,
+                        schema_extend: null
+                    }
+                }
+                $.ajax({
+                    url: options.schemaadd,
+                    data: data
                 }).done(function(response) {
                     if (!response.errno) {
                         self.element.find('#schema-content').append(self._createSchemaItemElem(response.data));
                         self.element.find('#schame-modal-data').find('button.data-cancel').trigger('click');
+                        options.schema_list.push(data);
                     } else {
                         $error.html(response.error);
                     }
@@ -198,6 +221,29 @@ define(function(require, exports, module) {
                 trigger: true
             });
             return false;
+        },
+        _dataCopyAddElem: function(event) {
+            var options = this.options,
+                h = [],
+                $title = this.element.find('#schema-modal-data-title'),
+                $content = this.element.find('#schema-modal-data-content'),
+                $tr = $(event.target).closest('tr'),
+                copy_index = parseInt($tr.attr('data-copy_index'), 10) + 1;
+            $tr.attr('data-copy_index', copy_index);
+            $title.html('复制创建');
+            h.push('<table class="table table-bordered">');
+            h.push('<tr><td>id</td><td></td></tr>');
+            h.push('<tr><td>schema_name</td><td><textarea data-key="schema_name">' + $tr.attr('data-schema_name') + '_new_' + copy_index + '</textarea></td></tr>');
+            h.push('<tr><td>schema_code</td><td><textarea data-key="schema_code">' + $tr.attr('data-schema_code') + '_new_' + copy_index + '</textarea></td></tr>');
+            h.push('</table>');
+            h.push('<div class="cs-error"></div>');
+            $content.addClass('hide').empty().append(h.join('')).removeClass('hide');
+            $('textarea').each(function() {
+                autosize($(this));
+            });
+            options.copyFrom = _.findWhere(options.schema_list, {
+                schema_code: $tr.attr('data-schema_code')
+            });
         },
         _dataDel: function(event) {
             var options = this.options,
