@@ -57,6 +57,7 @@ define(function(require, exports, module) {
             }).done(function(response) {
                 if (!response.errno) {
                     var data = response.data;
+                    options.schema_list = data.list;
                     self._createTableElem(data.list);
                 } else {
                     notify({
@@ -200,7 +201,7 @@ define(function(require, exports, module) {
                     if (!response.errno) {
                         self.element.find('#schema-content').append(self._createSchemaItemElem(response.data));
                         self.element.find('#schame-modal-data').find('button.data-cancel').trigger('click');
-                        options.schema_list.push(data);
+                        options.schema_list.push(response.data);
                     } else {
                         $error.html(response.error);
                     }
