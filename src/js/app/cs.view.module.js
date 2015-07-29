@@ -660,10 +660,10 @@ define(function(require, exports, module) {
             $.ajax({
                 url: options.select_import + '&fn=?',
                 crossDomain: true,
-                dataType: 'json'
+                dataType: 'jsonp'
             }).done(function(res) {
-                if ((!res.errno) && res.result && res.result.stream_data) {
-                    var datalist = res.result.stream_data;
+                if ((!res.errno) && res.data && res.data.stream_data) {
+                    var datalist = res.data.stream_data;
                     if (!_.isEmpty(datalist)) {
                         h.push('<table class="table table-bordered">');
                         h.push('<thead class="thin-border-bottom"><tr>');
@@ -689,7 +689,7 @@ define(function(require, exports, module) {
                                             h.push('' + options['select_' + schema_item.key][item[schema_item.key]] + '');
                                             break;
                                         case 'image':
-                                            if (!!item[schema_item.key] && !_.isEmpty(item[schema_item.key])) {
+                                            if (!!item[schema_item.key]) {
                                                 h.push('<img class="snapshot" src="' + (item[schema_item.key] || '') + '" />');
                                             } else {
                                                 h.push('');
@@ -717,7 +717,7 @@ define(function(require, exports, module) {
                                             h.push('' + options['select_' + schema_item.key][item[schema_item.key]] + '');
                                             break;
                                         case 'image':
-                                            if (!!item[schema_item.key] && !_.isEmpty(item[schema_item.key])) {
+                                            if (!!item[schema_item.key]) {
                                                 h.push('<img class="snapshot" src="' + (item[schema_item.key] || '') + '" />');
                                             } else {
                                                 h.push('');
